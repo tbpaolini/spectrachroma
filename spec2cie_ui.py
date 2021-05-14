@@ -1,12 +1,27 @@
 import tkinter as tk
 import tkinter.ttk as ttk
 from tkinter.font import Font
-from spec2cie import spectrum_container
+from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
+from sys import exit as sys_exit
+from spec2cie import (spectrum_container, plot_container)
 
 main_window = tk.Tk()
 main_window.title("Spectrum to CIE 1931")
-main_window.geometry("1024x576")
+main_window.geometry("1138x660")
 #main_window.minsize(160, 90)
+
+main_window.protocol("WM_DELETE_WINDOW", sys_exit)
+
+for i in range(2):
+    main_window.columnconfigure(
+        i,
+        weight = 1,
+    )
+for j in range(3):
+    main_window.rowconfigure(
+        j,
+        weight = 1,
+    )
 
 #-----------------------------------------
 # Initialise the spectrum container
@@ -27,7 +42,15 @@ button_open_files = tk.Button(
     text = "Open files",
     command = spectrum_box.import_files
 )
-button_open_files.pack()
+button_open_files.grid(
+    column = 1,
+    row = 0,
+    sticky = "se"
+)
+main_window.rowconfigure(
+    0,
+    minsize = 30,
+)
 
 
 #-----------------------------------------
@@ -79,10 +102,10 @@ tree_spectrum.heading("#3", text="CIE z")
 
 # The aligment of the text in the cells
 # Leftmost column has the text aligned to the left, while all others columns have centered text
-tree_spectrum.column("#0", anchor=tk.W, minwidth=100)
-tree_spectrum.column("#1", anchor=tk.CENTER, minwidth=50)
-tree_spectrum.column("#2", anchor=tk.CENTER, minwidth=50)
-tree_spectrum.column("#3", anchor=tk.CENTER, minwidth=50)
+tree_spectrum.column("#0", anchor=tk.W, minwidth=100, width=100, stretch=True)
+tree_spectrum.column("#1", anchor=tk.CENTER, minwidth=50, width=50, stretch=True)
+tree_spectrum.column("#2", anchor=tk.CENTER, minwidth=50, width=50, stretch=True)
+tree_spectrum.column("#3", anchor=tk.CENTER, minwidth=50, width=50, stretch=True)
 
 # The background colors for odd and even rows (to make rows alternate colors)
 tree_spectrum.tag_configure(
@@ -144,11 +167,52 @@ def update_spectrum_window(event):
 main_window.bind("<<FilesImported>>", update_spectrum_window)
 
 scroll_tree_spectrum.pack(side = tk.RIGHT, fill = tk.Y)
-tree_spectrum.pack()
-frame_tree_spectrum.pack()
+tree_spectrum.pack(side = tk.RIGHT, expand = True, fill = tk.BOTH)
 
+frame_tree_spectrum.grid(
+    column = 1,
+    row = 1,
+    sticky = "nsew",
+)
+
+#-----------------------------------------------------------------------------
+
+frame_cie = tk.Frame(
+    master = main_window,
+    borderwidth = 2,
+    relief = tk.SUNKEN,
+)
+plot = plot_container()
+canvas = FigureCanvasTkAgg(plot.fig_CIE, master = frame_cie)
+canvas.get_tk_widget().pack()
+
+main_window.columnconfigure(
+    0,
+    minsize = 640,
+)
+main_window.rowconfigure(
+    1,
+    minsize = 640,
+)
+
+frame_cie.grid(
+    column = 0,
+    row = 1,
+    rowspan = 2,
+    sticky = "ew",
+    # padx = 10,
+    # pady = 10,
+)
+
+canvas.draw()
+
+toolbar = NavigationToolbar2Tk(canvas, main_window, pack_toolbar=False)
+toolbar.update()
+toolbar.grid(
+    column = 0,
+    row = 0,
+    sticky = "w",
+)
+#-----------------------------------------------------------------------------
 
 main_window.mainloop()
-
-for i in spectrum_box:
-    print(i.file_name, i.xy, i.RGB)

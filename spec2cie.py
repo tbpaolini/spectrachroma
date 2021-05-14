@@ -4,6 +4,9 @@ from colour.plotting import *
 from tkinter.filedialog import askopenfilenames
 from pathlib import Path
 
+#-----------------------------------------------------------------------------
+# Calculation of color coordinates from spectrum file
+#-----------------------------------------------------------------------------
 class spectrum_to_cie:
     """Takes a text file with a luminescence emission spectrum,
     and returns an object with the coordinates of the perceived color in the color spaces: XYZ, CIE 1931, sRGB.
@@ -144,7 +147,9 @@ class spectrum_to_cie:
         spectrum_file.close()
         return spectrum_data
     
-
+#-----------------------------------------------------------------------------
+# Container to store the results from the spectrum_to_cie() class
+#-----------------------------------------------------------------------------
 class spectrum_container():
     """Store spectra and their color coordinates.
 
@@ -247,7 +252,153 @@ class spectrum_container():
             xy_dict['y'].append(obj_spectrum.xy[1])
         return xy_dict
 
+#-----------------------------------------------------------------------------
+# Plot the values stored on the spectrum_container() class
+#-----------------------------------------------------------------------------
+class plot_container():
+    def __init__(self):
+        # Set the figures to be saved with 300 dpi
+        plt.rcParams["savefig.dpi"] = 300
 
+        # Create the Chromaticity Diagram figure and its axes
+        self.fig_CIE, self.ax_CIE = plt.subplots(
+            figsize = (6.4, 6.4),
+            dpi = 100,
+        )
+
+        # Draw the Chromaticity Diagram
+        plot_chromaticity_diagram_CIE1931(
+            figure = self.fig_CIE,
+            axes = self.ax_CIE,
+            standalone = False,
+            title = "CIE 1931 Chromaticity Diagram",
+            bounding_box = (0.0, 0.81, 0.0, 0.9),
+            tight_layout = True,
+            transparent_background = False,
+            show_spectral_locus = False,
+        )
+        """NOTE:
+        "standalone = False" means that the figure isn't rendered yet, so it
+        is still opened for plotting the coordinates.
+        
+        Setting "transparent_background = False" actually makes the background
+        transparent, in spite of what the parameter name might suggest. We are
+        making axes background transparent so we can set the figure to black
+        and get the plot on a dark background too.
+
+        "show_spectral_locus = False" makes prevents the function from drawing
+        the wavelenghts around the spectrum. I don't like the style that the
+        module use for the locus, however the module doesn't allow to change
+        it easily. The locus will be drawn later, through a custom method, with
+        a style that fits better with what I am going for.
+        """
+
+        # Set the diagram's background to black
+        self.fig_CIE.set_facecolor("black")
+        self.ax_CIE.set_facecolor("black")
+
+        # Formatting the diagram's title (white bold text, with a bigger size)
+        self.ax_CIE.set_title(
+            self.ax_CIE.get_title(),
+            color = "white",
+            fontweight = "bold",
+            fontsize = "x-large",
+            pad = 10,
+        )
+
+        # Make white both axes and the bounding box
+        self.ax_CIE.spines["bottom"].set_color("white")
+        self.ax_CIE.spines["top"].set_color("white")
+        self.ax_CIE.spines["left"].set_color("white")
+        self.ax_CIE.spines["right"].set_color("white")
+
+        # Formatting the text of the labels (white text)
+        self.ax_CIE.set_xlabel(
+            self.ax_CIE.get_xlabel(),
+            color = "white",
+            fontsize = "medium",
+            labelpad = 5,
+        )
+
+        self.ax_CIE.set_ylabel(
+            self.ax_CIE.get_ylabel(),
+            color = "white",
+            fontsize = "medium",
+            labelpad = 5,
+        )
+
+        # Set the color of the tick values to white
+        self.ax_CIE.tick_params(axis="x", colors="white")
+        self.ax_CIE.tick_params(axis="y", colors="white")
+
+        # Draw the spectral locus
+        wave_labels = {
+            450: (0.15664093257730705, 0.017704804990891335),
+            470: (0.12411847672778557, 0.057802513373740476),
+            480: (0.091293507002271151, 0.13270204248699027),
+            520: (0.074302424773374967, 0.83380309134022801),
+            540: (0.2296196726496402, 0.75432908990274372),
+            560: (0.37310154386845751, 0.62445085979666115),
+            580: (0.5124863667817966, 0.48659078806085709),
+            600: (0.62703659976387227, 0.37249114521841825),
+            620: (0.69150397296170174, 0.30834226055665592),
+            700: (0.7346900232582807, 0.2653099767417193)
+        }
+        """NOTE
+        The above values were calculated by the following script:
+            import colour
+            from pprint import pprint
+
+            cmfs = colour.MSDS_CMFS['CIE 1931 2 Degree Standard Observer']
+
+            wavelenghts = (450, 470, 480, 520, 540, 560, 580, 600, 620, 700)
+
+            points = {}
+            for i in wavelenghts:
+                point_XYZ = colour.wavelength_to_XYZ(i, cmfs)
+                point_xy = colour.XYZ_to_xy(point_XYZ)
+                points.update({i: tuple(point_xy)})
+
+            pprint(points)
+        """
+
+        # Draw the wavelenght tick labels to the diagram
+        for point in wave_labels:
+            
+            # Set the position of the tick labels according to their values,
+            # so they don't overlap the diagram
+            if point < 520:
+                my_xytext = (-10, 0)    # Text position in relation to the tick
+                my_va = "center"        # Vertical alignment of the text in relation to the tick
+                my_ha = "right"         # Horizontal alignment of the text in relation to the tick
+            elif point > 520:
+                my_xytext = (10, 0)
+                my_va = "center"
+                my_ha = "left"
+            else:
+                my_xytext = (10, 10)
+                my_va = "bottom"
+                my_ha = "center"
+            
+            # Draw the wavelenghts and the ticks (in white)
+            self.ax_CIE.annotate(
+                point,                          # Wavelenght text
+                xy = wave_labels[point],        # Coordinate on the plot where to draw
+                xytext = my_xytext,             # Position of the text in relation to the plot coordinate
+                textcoords = "offset points",   # Specify that the coordinate is relative to the plot coordinate
+                color = "white",                # Color of the text
+                fontsize = 9,                   # Size of the text
+                va = my_va,                     # Vertical alignment of the text 
+                ha = my_ha,                     # Horizontal alignment of the text
+                
+                arrowprops = dict(              # Draw the tick
+                    color = "white",            # Color of the tick
+                    arrowstyle = "-"            # Style of the tick (no arrow heads)
+                )
+            )
+    
+    def plot_cie(self):
+        pass
 
 # get_spectrum_from_file(r"C:\Users\Tiago\Desktop\Python\Projetos\Espectros brutos\C3EUTTM1.txt")
 
@@ -298,7 +449,7 @@ class spectrum_container():
 # for i in teste:
 #     print(i.xy, i.RGB)
 
-
+"""
 teste = spectrum_container()
 teste.import_files()
 if len(teste) > 0:
@@ -389,11 +540,11 @@ for point in wave_labels:
         my_va = "bottom"
         my_ha = "center"
     
-    plt.annotate(
+    ax_CIE.annotate(
         point,
         xy = wave_labels[point],
         xytext = my_xytext,
-        textcoords='offset points',
+        textcoords = "offset points",
         color = "white",
         fontsize = 9,
         va = my_va,
@@ -404,9 +555,9 @@ for point in wave_labels:
         )
     )
 
-plt.scatter(teste[0].xy[0], teste[0].xy[1], marker="o", color="#212121", s=80)
+ax_CIE.scatter(teste[0].xy[0], teste[0].xy[1], marker="o", color="#212121", s=80)
 
-plt.annotate("1",
+ax_CIE.annotate("1",
              color = "white",
              xy=teste[0].xy,
              xytext=(0, 0),
@@ -422,3 +573,4 @@ plt.show()
 
 
 # plot_single_sd(teste[0].spectrum_raw)
+"""
