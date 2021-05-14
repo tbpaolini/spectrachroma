@@ -298,25 +298,118 @@ class spectrum_container():
 # for i in teste:
 #     print(i.xy, i.RGB)
 
-"""
+
 teste = spectrum_container()
 teste.import_files()
-rgb = list(teste[0].RGB)
+if len(teste) > 0:
+    rgb = list(teste[0].RGB)
 
-for c in range(3):
-    rgb[c] = int(rgb[c] * 255)
+    for c in range(3):
+        rgb[c] = int(rgb[c] * 255)
 
-print(teste[0].xy, rgb)
+    print(teste[0].xy, rgb)
 
-#plt.style.use('dark_background')
 
-plot_chromaticity_diagram_CIE1931(standalone=False)
+plt.rcParams['savefig.dpi'] = 300
 
-plt.scatter(teste[0].xy[0], teste[0].xy[1], marker="o", color='black', s=80)
-plt.annotate("9",
-             color = 'white',
+fig_CIE, ax_CIE = plt.subplots(
+    figsize = (6.4, 6.4),
+    dpi = 100,
+)
+
+plot_chromaticity_diagram_CIE1931(
+    figure = fig_CIE,
+    axes = ax_CIE,
+    standalone=False,
+    title="CIE 1931 Chromaticity Diagram",
+    bounding_box = (0, 0.8, 0.0, 0.9),
+    tight_layout = True,
+    transparent_background = False,
+    show_spectral_locus = False,
+)
+
+fig_CIE.set_facecolor("black")
+ax_CIE.set_facecolor("black")
+
+ax_CIE.set_title(
+    ax_CIE.get_title(),
+    color = "white",
+    fontweight = "bold",
+    fontsize = "x-large",
+    pad = 10,
+)
+
+ax_CIE.spines["bottom"].set_color("white")
+ax_CIE.spines["top"].set_color("white")
+ax_CIE.spines["left"].set_color("white")
+ax_CIE.spines["right"].set_color("white")
+
+ax_CIE.set_xlabel(
+    ax_CIE.get_xlabel(),
+    color = "white",
+    fontsize = "medium",
+    labelpad = 5,
+)
+
+ax_CIE.set_ylabel(
+    ax_CIE.get_ylabel(),
+    color = "white",
+    fontsize = "medium",
+    labelpad = 5,
+)
+
+ax_CIE.tick_params(axis="x", colors="white")
+ax_CIE.tick_params(axis="y", colors="white")
+
+
+wave_labels = {
+    450: (0.15664093257730705, 0.017704804990891335),
+    470: (0.12411847672778557, 0.057802513373740476),
+    480: (0.091293507002271151, 0.13270204248699027),
+    520: (0.074302424773374967, 0.83380309134022801),
+    540: (0.2296196726496402, 0.75432908990274372),
+    560: (0.37310154386845751, 0.62445085979666115),
+    580: (0.5124863667817966, 0.48659078806085709),
+    600: (0.62703659976387227, 0.37249114521841825),
+    620: (0.69150397296170174, 0.30834226055665592),
+    700: (0.7346900232582807, 0.2653099767417193)
+}
+
+for point in wave_labels:
+    if point < 520:
+        my_xytext = (-10, 0)
+        my_va = "center"
+        my_ha = "right"
+    elif point > 520:
+        my_xytext = (10, 0)
+        my_va = "center"
+        my_ha = "left"
+    else:
+        my_xytext = (10, 10)
+        my_va = "bottom"
+        my_ha = "center"
+    
+    plt.annotate(
+        point,
+        xy = wave_labels[point],
+        xytext = my_xytext,
+        textcoords='offset points',
+        color = "white",
+        fontsize = 9,
+        va = my_va,
+        ha = my_ha,
+        arrowprops = dict(
+            color = "white",
+            arrowstyle = "-"
+        )
+    )
+
+plt.scatter(teste[0].xy[0], teste[0].xy[1], marker="o", color="#212121", s=80)
+
+plt.annotate("1",
+             color = "white",
              xy=teste[0].xy,
-             xytext=(0, -0.5),
+             xytext=(0, 0),
              textcoords='offset points',
              ha = "center",
              va = "center",
@@ -324,7 +417,8 @@ plt.annotate("9",
              fontweight = "bold",
              fontsize = "x-small",
 )
+
 plt.show()
 
+
 # plot_single_sd(teste[0].spectrum_raw)
-"""
