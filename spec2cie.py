@@ -257,6 +257,10 @@ class spectrum_container():
 #-----------------------------------------------------------------------------
 class plot_container():
     def __init__(self):
+        
+        # The amount of points plotted on the CIE Chromaticity Diagram
+        self.points_count = 0
+        
         # Set the figures to be saved with 300 dpi
         plt.rcParams["savefig.dpi"] = 300
 
@@ -397,8 +401,40 @@ class plot_container():
                 )
             )
     
-    def plot_cie(self):
-        pass
+    def plot_cie(self, CIEx, CIEy):
+        len_CIEx = len(CIEx)
+        len_CIEy = len(CIEy)
+
+        if (len_CIEx == 0) or (len_CIEx != len_CIEy):
+            return False
+        
+        self.ax_CIE.scatter(CIEx, CIEy, marker="o", color="#212121", s=3)
+        print(f"About to annotate points:\n{CIEx}\n{CIEy}")
+
+        point_index = 0
+        for point in range(self.points_count, self.points_count + len_CIEx):
+
+            self.ax_CIE.annotate(point + 1,
+                color = "white",
+                xy = (CIEx[point_index], CIEy[point_index]),
+                xytext = (0, 0),
+                textcoords = "offset points",
+                ha = "center",
+                va = "center",
+                fontfamily = "sans-serif",
+                fontweight = "bold",
+                fontsize = 7,
+                bbox = dict(
+                    boxstyle = "circle",
+                    color = "#212121"
+                )
+            )
+
+            print(f"Point: {(CIEx[point_index], CIEy[point_index])} (index: {point_index})")
+            point_index += 1
+        
+        self.points_count += len_CIEx
+
 
 # get_spectrum_from_file(r"C:\Users\Tiago\Desktop\Python\Projetos\Espectros brutos\C3EUTTM1.txt")
 

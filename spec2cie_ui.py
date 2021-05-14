@@ -121,10 +121,12 @@ tree_spectrum.tag_configure(
 
 # Update the window when new files are successfully loaded
 def update_spectrum_window(event):
-    global spectrum_count, spectrum_CIEx, spectrum_CIEy, spectrum_box
+    global spectrum_count, spectrum_CIEx, spectrum_CIEy, spectrum_box, canvas
+
+    count_start = spectrum_count
 
     # Populate the lists of the CIE xy color coordinates
-    for spectrum in spectrum_box:
+    for spectrum in spectrum_box[spectrum_count:]:
         spectrum_CIEx.append(spectrum.x)
         spectrum_CIEy.append(spectrum.y)
     
@@ -160,8 +162,9 @@ def update_spectrum_window(event):
         The plotting still uses the maximum precision provided by Python.
         """
 
-        # Plot the point to the spectra
-        pass # to do
+    # Plot the point to the spectra
+    plot.plot_cie(spectrum_CIEx[count_start:spectrum_count], spectrum_CIEy[count_start:spectrum_count])
+    canvas.draw()
 
 # Bind the update function to the "Files Imported" event
 main_window.bind("<<FilesImported>>", update_spectrum_window)
