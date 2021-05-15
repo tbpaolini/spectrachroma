@@ -409,7 +409,7 @@ class plot_container():
             return False
         
         self.ax_CIE.scatter(CIEx, CIEy, marker="o", color="#212121", s=3)
-        print(f"About to annotate points:\n{CIEx}\n{CIEy}")
+        #print(f"About to annotate points:\n{CIEx}\n{CIEy}")
 
         point_index = 0
         for point in range(self.points_count, self.points_count + len_CIEx):
@@ -430,10 +430,15 @@ class plot_container():
                 )
             )
 
-            print(f"Point: {(CIEx[point_index], CIEy[point_index])} (index: {point_index})")
+            #print(f"Point: {(CIEx[point_index], CIEy[point_index])} (index: {point_index})")
             point_index += 1
         
         self.points_count += len_CIEx
+    
+    def __del__(self):
+        """Ensure that the plots get closed when the object is deleted.
+        """
+        plt.close(self.fig_CIE)
 
 
 # get_spectrum_from_file(r"C:\Users\Tiago\Desktop\Python\Projetos\Espectros brutos\C3EUTTM1.txt")
