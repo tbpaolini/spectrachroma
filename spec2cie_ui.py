@@ -2,40 +2,182 @@ import tkinter as tk
 import tkinter.ttk as ttk
 from tkinter.font import Font
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
+from matplotlib.pyplot import close as plot_close
 from sys import exit as sys_exit
 from spec2cie import (spectrum_container, plot_container)
 
+#-----------------------------------------------------------------------------
+# Initialize the main window
+#-----------------------------------------------------------------------------
+
 main_window = tk.Tk()
 main_window.title("Spectrum to CIE 1931")
-main_window.geometry("1024x700")
+#main_window.geometry("1024x700")
 #main_window.minsize(160, 90)
 
+# Exit the program properly when closing the window or pressing Alt+F4
+main_window.bind("<Alt-F4>", lambda event: plot_close("all"))
 main_window.protocol("WM_DELETE_WINDOW", sys_exit)
+"""NOTE
+This is necessary because Matplotlib does not automatically close the plots
+when the window is closed. That would cause the program to hang on the shell.
+"""
 
-for i in range(2):
-    main_window.columnconfigure(
-        i,
-        weight = 1,
-    )
-for j in range(3):
-    main_window.rowconfigure(
-        j,
-        weight = 1,
-    )
+# Left column - Color and spectrum tables
+main_window.columnconfigure(
+    0,
+    weight = 1,
+    minsize = 300
+)
 
-#-----------------------------------------
+# Right column - CIE Chromaticity Diagram
+main_window.columnconfigure(
+    1,
+    weight = 1,
+    minsize = 480,
+)
+
+# Top row - Toolbar
+main_window.rowconfigure(
+    0,
+    weight = 0,
+)
+
+# Next two rows (left column) - Tables
+main_window.rowconfigure(
+    1,
+    weight = 1,
+)
+main_window.rowconfigure(
+    2,
+    weight = 1,
+)
+
+#-----------------------------------------------------------------------------
 # Initialise the spectrum container
-#-----------------------------------------
+#-----------------------------------------------------------------------------
 
 spectrum_box = spectrum_container(tk_window=main_window)
 spectrum_count = 0
 spectrum_CIEx = []
 spectrum_CIEy = []
 
+#-----------------------------------------------------------------------------
+# Menu bar
+#-----------------------------------------------------------------------------
 
-#-----------------------------------------
+# Disable detachable menus
+main_window.option_add("*tearOff", tk.FALSE)
+
+# Create menu bar on the main window
+menubar = tk.Menu(main_window)
+main_window["menu"] = menubar
+
+# Create top level menus
+menu_file = tk.Menu(menubar)
+menu_edit = tk.Menu(menubar)
+menu_help = tk.Menu(menubar)
+menubar.add_cascade(menu=menu_file, label="File")
+menubar.add_cascade(menu=menu_edit, label="Edit")
+menubar.add_cascade(menu=menu_help, label="Help")
+
+# Add File commands
+menu_file.add_command(
+    label = "Add spectra to diagram...",
+    command = spectrum_box.import_files,
+    accelerator = "Ctrl+O",
+)
+menu_file.add_command(
+    label = "New diagram",
+    accelerator = "Ctrl+N",
+    # command = ,
+)
+
+menu_file.add_separator()
+
+menu_file.add_command(
+    label = "Save figure...",
+    accelerator = "Ctrl+S",
+    # command = ,
+)
+
+menu_file.add_command(
+    label = "Save coordinates to text...",
+    accelerator = "Ctrl+T",
+    # command = ,
+)
+
+menu_file.add_separator()
+
+menu_file.add_command(
+    label = "Close",
+    accelerator = "Alt+F4",
+    command = sys_exit,
+)
+
+# Add Edit commands
+show_gridlines = tk.BooleanVar()
+show_gridlines.set(True)
+menu_edit.add_checkbutton(
+    label = "Show grid lines",
+    variable = show_gridlines,
+    onvalue = True,
+    offvalue = False,
+    accelerator = "F2",
+    #command = ,
+)
+
+show_axis = tk.BooleanVar()
+show_axis.set(True)
+menu_edit.add_checkbutton(
+    label = "Show axis",
+    variable = show_axis,
+    onvalue = True,
+    offvalue = False,
+    accelerator = "F3",
+    #command = ,
+)
+
+show_locus = tk.BooleanVar()
+show_locus.set(True)
+menu_edit.add_checkbutton(
+    label = "Show spectral locus",
+    variable = show_locus,
+    onvalue = True,
+    offvalue = False,
+    accelerator = "F4",
+    #command = ,
+)
+
+menu_edit.add_separator()
+
+menu_edit.add_command(
+    label = "Delete selected spectra",
+    accelerator = "Del",
+    #command = ,
+)
+menu_edit.add_command(
+    label = "Delete all spectra",
+    #command = ,
+)
+
+# Add Help commands
+menu_help.add_command(
+    label = "Help",
+    accelerator = "F1",
+    # command = ,
+)
+
+menu_help.add_separator()
+
+menu_help.add_command(
+    label = "About",
+    # command = ,
+)
+
+#-----------------------------------------------------------------------------
 # Button to load spectrum files
-#-----------------------------------------
+#-----------------------------------------------------------------------------
 
 button_open_files = tk.Button(
     master = main_window,
@@ -43,19 +185,15 @@ button_open_files = tk.Button(
     command = spectrum_box.import_files
 )
 button_open_files.grid(
-    column = 1,
+    column = 0,
     row = 0,
-    sticky = "se"
+    sticky = "snw",
 )
-# main_window.rowconfigure(
-#     0,
-#     #minsize = 30,
-# )
 
 
-#-----------------------------------------
+#-----------------------------------------------------------------------------
 # Treeview to show the spectrum color data
-#-----------------------------------------
+#-----------------------------------------------------------------------------
 
 style = ttk.Style()
 style.theme_use("alt")  # Styles: "clam", "alt", "default", "classic"
@@ -142,7 +280,7 @@ def update_spectrum_window(event):
         spectrum_count += 1
 
         # Append the data to the treeview
-        tree_spectrum.insert(
+        last_item = tree_spectrum.insert(
             parent = "",
             index = tk.END,
             text = f"{spectrum_count:>2}. {spectrum_box[i].file_name}",
@@ -162,6 +300,13 @@ def update_spectrum_window(event):
         The plotting still uses the maximum precision provided by Python.
         """
 
+    # Change the selection to the last item, if no more than 1 item is already selected
+    if len(tree_spectrum.selection()) <= 1:
+        tree_spectrum.selection_set(last_item)
+    
+    # Change the focus to the last item
+    tree_spectrum.focus(last_item)
+
     # Plot the point to the spectra
     plot.plot_cie(spectrum_CIEx[count_start:spectrum_count], spectrum_CIEy[count_start:spectrum_count])
     canvas.draw()
@@ -179,12 +324,14 @@ tree_spectrum.pack(side = tk.RIGHT,
 )
 
 frame_tree_spectrum.grid(
-    column = 1,
-    row = 1,
+    column = 0,
+    row = 2,
     sticky = "nsew",
+    padx = 3,
+    pady = 3,
 )
 
-#-----------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------------------------------------
 
 frame_cie = tk.Frame(
     master = main_window,
@@ -198,22 +345,14 @@ canvas.get_tk_widget().pack(
     fill = tk.BOTH,
 )
 
-main_window.columnconfigure(
-    0,
-    minsize = 480,
-)
-main_window.rowconfigure(
-    1,
-    minsize = 480,
-)
 
 frame_cie.grid(
-    column = 0,
+    column = 1,
     row = 1,
     rowspan = 2,
     sticky = "nsew",
-    # padx = 10,
-    # pady = 10,
+    padx = 3,
+    pady = 3,
 )
 
 canvas.draw()
@@ -221,10 +360,10 @@ canvas.draw()
 toolbar = NavigationToolbar2Tk(canvas, main_window, pack_toolbar=False)
 toolbar.update()
 toolbar.grid(
-    column = 0,
+    column = 1,
     row = 0,
     sticky = "w",
 )
-#-----------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------------------------------------
 
 main_window.mainloop()
