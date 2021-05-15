@@ -7,7 +7,7 @@ from spec2cie import (spectrum_container, plot_container)
 
 main_window = tk.Tk()
 main_window.title("Spectrum to CIE 1931")
-main_window.geometry("1138x660")
+main_window.geometry("1024x700")
 #main_window.minsize(160, 90)
 
 main_window.protocol("WM_DELETE_WINDOW", sys_exit)
@@ -47,10 +47,10 @@ button_open_files.grid(
     row = 0,
     sticky = "se"
 )
-main_window.rowconfigure(
-    0,
-    minsize = 30,
-)
+# main_window.rowconfigure(
+#     0,
+#     #minsize = 30,
+# )
 
 
 #-----------------------------------------
@@ -83,7 +83,7 @@ frame_tree_spectrum = ttk.Frame(
 tree_spectrum = ttk.Treeview(
     master = frame_tree_spectrum,
     columns = ("CIE x", "CIE y", "CIE z"),
-    height = 1000   # Set to a very high number so the rows fill all the available space on the window
+    #height = 30
 )
 
 # Scrollbar for the treeview
@@ -169,8 +169,14 @@ def update_spectrum_window(event):
 # Bind the update function to the "Files Imported" event
 main_window.bind("<<FilesImported>>", update_spectrum_window)
 
-scroll_tree_spectrum.pack(side = tk.RIGHT, fill = tk.Y)
-tree_spectrum.pack(side = tk.RIGHT, expand = True, fill = tk.BOTH)
+scroll_tree_spectrum.pack(
+    side = tk.RIGHT,
+    fill = tk.Y
+)
+tree_spectrum.pack(side = tk.RIGHT,
+    expand = True,
+    fill = tk.BOTH,
+)
 
 frame_tree_spectrum.grid(
     column = 1,
@@ -187,22 +193,25 @@ frame_cie = tk.Frame(
 )
 plot = plot_container()
 canvas = FigureCanvasTkAgg(plot.fig_CIE, master = frame_cie)
-canvas.get_tk_widget().pack()
+canvas.get_tk_widget().pack(
+    expand = True,
+    fill = tk.BOTH,
+)
 
 main_window.columnconfigure(
     0,
-    minsize = 640,
+    minsize = 480,
 )
 main_window.rowconfigure(
     1,
-    minsize = 640,
+    minsize = 480,
 )
 
 frame_cie.grid(
     column = 0,
     row = 1,
     rowspan = 2,
-    sticky = "ew",
+    sticky = "nsew",
     # padx = 10,
     # pady = 10,
 )

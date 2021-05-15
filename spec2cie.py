@@ -266,7 +266,7 @@ class plot_container():
 
         # Create the Chromaticity Diagram figure and its axes
         self.fig_CIE, self.ax_CIE = plt.subplots(
-            figsize = (6.4, 6.4),
+            figsize = (4.8, 4.8),
             dpi = 100,
         )
 
@@ -276,7 +276,7 @@ class plot_container():
             axes = self.ax_CIE,
             standalone = False,
             title = "CIE 1931 Chromaticity Diagram",
-            bounding_box = (0.0, 0.81, 0.0, 0.9),
+            bounding_box = (0.0, 0.815, 0.0, 0.9),
             tight_layout = True,
             transparent_background = False,
             show_spectral_locus = False,
@@ -306,7 +306,7 @@ class plot_container():
             self.ax_CIE.get_title(),
             color = "white",
             fontweight = "bold",
-            fontsize = "x-large",
+            fontsize = "large",
             pad = 10,
         )
 
@@ -391,7 +391,7 @@ class plot_container():
                 xytext = my_xytext,             # Position of the text in relation to the plot coordinate
                 textcoords = "offset points",   # Specify that the coordinate is relative to the plot coordinate
                 color = "white",                # Color of the text
-                fontsize = 9,                   # Size of the text
+                fontsize = 8,                   # Size of the text
                 va = my_va,                     # Vertical alignment of the text 
                 ha = my_ha,                     # Horizontal alignment of the text
                 
@@ -423,10 +423,10 @@ class plot_container():
                 va = "center",
                 fontfamily = "sans-serif",
                 fontweight = "bold",
-                fontsize = 7,
+                fontsize = 6,
                 bbox = dict(
                     boxstyle = "circle",
-                    color = "#212121"
+                    color = "#212121",
                 )
             )
 
