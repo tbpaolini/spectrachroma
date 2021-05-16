@@ -58,9 +58,10 @@ main_window.rowconfigure(
 #-----------------------------------------------------------------------------
 
 spectrum_box = spectrum_container(tk_window=main_window)
-spectrum_count = 0
-spectrum_CIEx = []
-spectrum_CIEy = []
+spectrum_count = 0          # How many spectra are stored in the container
+spectrum_CIEx = []          # List the x CIE color coordinate for each spectrum
+spectrum_CIEy = []          # List the y CIE color coordinate for each spectrum
+spectrum_CIE_dict = {}      # Dictionary to associate each plotted point to its spectrum
 
 #-----------------------------------------------------------------------------
 # Menu bar
@@ -176,6 +177,77 @@ menu_help.add_command(
 )
 
 #-----------------------------------------------------------------------------
+# Callback functions
+#-----------------------------------------------------------------------------
+
+# --- Update the window when new files are successfully loaded ---#
+
+def update_spectrum_window(event):
+    global spectrum_count, spectrum_CIEx, spectrum_CIEy, spectrum_CIE_dict, spectrum_box, canvas
+
+    count_start = spectrum_count
+
+    # Populate the lists of the CIE xy color coordinates
+    for spectrum in spectrum_box[spectrum_count:]:
+        spectrum_CIEx.append(spectrum.x)
+        spectrum_CIEy.append(spectrum.y)
+    
+    # Add the the color coordinates to the treeview and the diagram
+    first_loop = True
+    for i in range(spectrum_count, len(spectrum_box)):
+        
+        # Set the background colors for the odd and even rows
+        if spectrum_count % 2 == 1:
+            format_tag = ("odd",)
+        else:
+            format_tag = ("even",)
+
+        spectrum_count += 1
+
+        # Append the data to the treeview
+        CIE_point = tree_spectrum.insert(
+            parent = "",
+            index = tk.END,
+            text = f"{spectrum_count:>2}. {spectrum_box[i].file_name}",
+            values = (f"{spectrum_CIEx[i]:.3f}", f"{spectrum_CIEy[i]:.3f}", f"{1.0 - spectrum_CIEx[i] - spectrum_CIEy[i]:.3f}"),
+            tags = format_tag
+        )
+        """NOTE:
+        On the first column, if the spectrum count is a single digit, then it gets a white space added to its left.
+        This way the labels look better, because all the periods after the count get aligned vertically (on counts up to 99).
+        If the count goes to the 3 digits, the periods just get misaligned. I doubt that anyone is going to add 100+ files,
+        and even if they do the misalignment will be hardly a problem on longer labels.
+
+        On a related note, for the Treeview the coordinates values get rounded to 3 decimals. This is the precision normally
+        seen on literature, and 3 decimals on each coordinate (x,y) already covers one million different colors. Any more
+        decimals would hardly produce any difference on the perceived color, plus it likely is beyond the experimental error.
+
+        The plotting still uses the maximum precision provided by Python.
+        """
+        
+        # Update the dictionary that holds which item corresponds to which spectrum in the container
+        spectrum_CIE_dict.update({CIE_point: spectrum_box[i]})
+        
+        # Stores the ID of first imported item, so it can be highlighted on the treeview
+        if first_loop:
+            first_item = CIE_point
+            first_loop = False
+
+    # Change the selection to the first imported item, if no more than 1 item is already selected
+    if len(tree_spectrum.selection()) <= 1:
+        tree_spectrum.selection_set(first_item)
+    
+    # Change the focus to the first imported item
+    tree_spectrum.focus(first_item)
+
+    # Plot the point to the spectra
+    plot.plot_cie(spectrum_CIEx[count_start:spectrum_count], spectrum_CIEy[count_start:spectrum_count])
+    canvas.draw()
+
+# Bind the update function to the "Files Imported" event
+main_window.bind("<<FilesImported>>", update_spectrum_window)
+
+#-----------------------------------------------------------------------------
 # Button to load spectrum files
 #-----------------------------------------------------------------------------
 
@@ -257,72 +329,18 @@ tree_spectrum.tag_configure(
     foreground = "black"
 )
 
-# Update the window when new files are successfully loaded
-def update_spectrum_window(event):
-    global spectrum_count, spectrum_CIEx, spectrum_CIEy, spectrum_box, canvas
-
-    count_start = spectrum_count
-
-    # Populate the lists of the CIE xy color coordinates
-    for spectrum in spectrum_box[spectrum_count:]:
-        spectrum_CIEx.append(spectrum.x)
-        spectrum_CIEy.append(spectrum.y)
-    
-    # Add the the color coordinates to the treeview and the diagram
-    for i in range(spectrum_count, len(spectrum_box)):
-        
-        # Set the background colors for the odd and even rows
-        if spectrum_count % 2 == 1:
-            format_tag = ("odd",)
-        else:
-            format_tag = ("even",)
-
-        spectrum_count += 1
-
-        # Append the data to the treeview
-        last_item = tree_spectrum.insert(
-            parent = "",
-            index = tk.END,
-            text = f"{spectrum_count:>2}. {spectrum_box[i].file_name}",
-            values = (f"{spectrum_CIEx[i]:.3f}", f"{spectrum_CIEy[i]:.3f}", f"{1.0 - spectrum_CIEx[i] - spectrum_CIEy[i]:.3f}"),
-            tags = format_tag
-        )
-        """NOTE:
-        On the first column, if the spectrum count is a single digit, then it gets a white space added to its left.
-        This way the labels look better, because all the periods after the count get aligned vertically (on counts up to 99).
-        If the count goes to the 3 digits, the periods just get misaligned. I doubt that anyone is going to add 100+ files,
-        and even if they do the misalignment will be hardly a problem on longer labels.
-
-        On a related note, for the Treeview the coordinates values get rounded to 3 decimals. This is the precision normally
-        seen on literature, and 3 decimals on each coordinate (x,y) already covers one million different colors. Any more
-        decimals would hardly produce any difference on the perceived color, plus it likely is beyond the experimental error.
-
-        The plotting still uses the maximum precision provided by Python.
-        """
-
-    # Change the selection to the last item, if no more than 1 item is already selected
-    if len(tree_spectrum.selection()) <= 1:
-        tree_spectrum.selection_set(last_item)
-    
-    # Change the focus to the last item
-    tree_spectrum.focus(last_item)
-
-    # Plot the point to the spectra
-    plot.plot_cie(spectrum_CIEx[count_start:spectrum_count], spectrum_CIEy[count_start:spectrum_count])
-    canvas.draw()
-
-# Bind the update function to the "Files Imported" event
-main_window.bind("<<FilesImported>>", update_spectrum_window)
-
+# Pack the scrollbar to the right side of the frame and make the bar fill the entire height
 scroll_tree_spectrum.pack(
     side = tk.RIGHT,
     fill = tk.Y
 )
+# Pack the treeview to the frame and make the treeview to fill the remaining space on the frame
 tree_spectrum.pack(side = tk.RIGHT,
     expand = True,
     fill = tk.BOTH,
 )
 
+# Add the treeview frame to the main window grid, and make it fill the available space
 frame_tree_spectrum.grid(
     column = 0,
     row = 2,
