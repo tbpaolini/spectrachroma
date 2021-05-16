@@ -266,7 +266,7 @@ class plot_container():
 
         # Create the Chromaticity Diagram figure and its axes
         self.fig_CIE, self.ax_CIE = plt.subplots(
-            figsize = (4.8, 4.8),
+            figsize = (4.8, 5.4),
             dpi = 100,
         )
 
@@ -276,7 +276,7 @@ class plot_container():
             axes = self.ax_CIE,
             standalone = False,
             title = "CIE 1931 Chromaticity Diagram",
-            bounding_box = (0.0, 0.815, 0.0, 0.9),
+            bounding_box = (0.0, 0.8, 0.0, 0.9),
             tight_layout = True,
             transparent_background = False,
             show_spectral_locus = False,
@@ -372,19 +372,19 @@ class plot_container():
             # Set the position of the tick labels according to their values,
             # so they don't overlap the diagram
             if point < 520:
-                my_xytext = (-10, 0)    # Text position in relation to the tick
+                my_xytext = (-7, 0)    # Text position in relation to the tick
                 my_va = "center"        # Vertical alignment of the text in relation to the tick
                 my_ha = "right"         # Horizontal alignment of the text in relation to the tick
             elif point > 520:
-                my_xytext = (10, 0)
+                my_xytext = (7, 0)
                 my_va = "center"
                 my_ha = "left"
             else:
-                my_xytext = (10, 10)
+                my_xytext = (7, 7)
                 my_va = "bottom"
                 my_ha = "center"
             
-            # Draw the wavelenghts and the ticks (in white)
+            # Draw the wavelenghts text and the tick lines (all in white)
             self.ax_CIE.annotate(
                 point,                          # Wavelenght text
                 xy = wave_labels[point],        # Coordinate on the plot where to draw
@@ -395,9 +395,11 @@ class plot_container():
                 va = my_va,                     # Vertical alignment of the text 
                 ha = my_ha,                     # Horizontal alignment of the text
                 
-                arrowprops = dict(              # Draw the tick
-                    color = "white",            # Color of the tick
-                    arrowstyle = "-"            # Style of the tick (no arrow heads)
+                arrowprops = dict(              # Draw the line
+                    color = "white",            # Color of the line
+                    arrowstyle = "-",           # Style of the line (no arrow heads)
+                    shrinkA = 0,                # Distance the line tail is from the text
+                    shrinkB = 2,                # Distance the line head is from the diagram
                 )
             )
     

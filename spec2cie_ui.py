@@ -34,7 +34,7 @@ main_window.columnconfigure(
 main_window.columnconfigure(
     1,
     weight = 1,
-    minsize = 480,
+    minsize = 540,
 )
 
 # Top row - Toolbar
@@ -364,6 +364,8 @@ toolbar.grid(
     row = 0,
     sticky = "w",
 )
+
+# toolbar.message.get()
 #-----------------------------------------------------------------------------------------------------------------
 
 main_window.mainloop()
