@@ -1,9 +1,9 @@
 import tkinter as tk
 import tkinter.ttk as ttk
-from tkinter.font import Font
+from tkinter.messagebox import askyesno
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
 from matplotlib.pyplot import close as plot_close
-from sys import exit as sys_exit
+import sys
 from spec2cie import (spectrum_container, plot_container)
 
 #-----------------------------------------------------------------------------
@@ -15,13 +15,6 @@ main_window.title("Spectrum to CIE 1931")
 #main_window.geometry("1024x700")
 #main_window.minsize(160, 90)
 
-# Exit the program properly when closing the window or pressing Alt+F4
-main_window.bind("<Alt-F4>", lambda event: plot_close("all"))
-main_window.protocol("WM_DELETE_WINDOW", sys_exit)
-"""NOTE
-This is necessary because Matplotlib does not automatically close the plots
-when the window is closed. That would cause the program to hang on the shell.
-"""
 
 # Left column - Color and spectrum tables
 main_window.columnconfigure(
@@ -62,119 +55,6 @@ spectrum_count = 0          # How many spectra are stored in the container
 spectrum_CIEx = []          # List the x CIE color coordinate for each spectrum
 spectrum_CIEy = []          # List the y CIE color coordinate for each spectrum
 spectrum_CIE_dict = {}      # Dictionary to associate each plotted point to its spectrum
-
-#-----------------------------------------------------------------------------
-# Menu bar
-#-----------------------------------------------------------------------------
-
-# Disable detachable menus
-main_window.option_add("*tearOff", tk.FALSE)
-
-# Create menu bar on the main window
-menubar = tk.Menu(main_window)
-main_window["menu"] = menubar
-
-# Create top level menus
-menu_file = tk.Menu(menubar)
-menu_edit = tk.Menu(menubar)
-menu_help = tk.Menu(menubar)
-menubar.add_cascade(menu=menu_file, label="File")
-menubar.add_cascade(menu=menu_edit, label="Edit")
-menubar.add_cascade(menu=menu_help, label="Help")
-
-# Add File commands
-menu_file.add_command(
-    label = "Add spectra to diagram...",
-    command = spectrum_box.import_files,
-    accelerator = "Ctrl+O",
-)
-menu_file.add_command(
-    label = "New diagram",
-    accelerator = "Ctrl+N",
-    # command = ,
-)
-
-menu_file.add_separator()
-
-menu_file.add_command(
-    label = "Save figure...",
-    accelerator = "Ctrl+S",
-    # command = ,
-)
-
-menu_file.add_command(
-    label = "Save coordinates to text...",
-    accelerator = "Ctrl+T",
-    # command = ,
-)
-
-menu_file.add_separator()
-
-menu_file.add_command(
-    label = "Close",
-    accelerator = "Alt+F4",
-    command = sys_exit,
-)
-
-# Add Edit commands
-show_gridlines = tk.BooleanVar()
-show_gridlines.set(True)
-menu_edit.add_checkbutton(
-    label = "Show grid lines",
-    variable = show_gridlines,
-    onvalue = True,
-    offvalue = False,
-    accelerator = "F2",
-    #command = ,
-)
-
-show_axis = tk.BooleanVar()
-show_axis.set(True)
-menu_edit.add_checkbutton(
-    label = "Show axis",
-    variable = show_axis,
-    onvalue = True,
-    offvalue = False,
-    accelerator = "F3",
-    #command = ,
-)
-
-show_locus = tk.BooleanVar()
-show_locus.set(True)
-menu_edit.add_checkbutton(
-    label = "Show spectral locus",
-    variable = show_locus,
-    onvalue = True,
-    offvalue = False,
-    accelerator = "F4",
-    #command = ,
-)
-
-menu_edit.add_separator()
-
-menu_edit.add_command(
-    label = "Delete selected spectra",
-    accelerator = "Del",
-    #command = ,
-)
-menu_edit.add_command(
-    label = "Delete all spectra",
-    #command = ,
-)
-
-# Add Help commands
-menu_help.add_command(
-    label = "Help",
-    accelerator = "F1",
-    # command = ,
-)
-
-menu_help.add_separator()
-
-menu_help.add_command(
-    label = "About",
-    # command = ,
-)
 
 #-----------------------------------------------------------------------------
 # Callback functions
@@ -246,6 +126,146 @@ def update_spectrum_window(event):
 
 # Bind the update function to the "Files Imported" event
 main_window.bind("<<FilesImported>>", update_spectrum_window)
+
+
+#--- Exit the program ---#
+
+confirm_exit = True    # Will be set to True when a file is imported and to False when a file is saved
+
+# As the user if they want to close the program, when there are still stuff to save
+def clean_exit(*event):
+    if confirm_exit:
+        confirmation = askyesno(
+            title = "Confirm exit",
+            message = "Unsaved data will be lost. Continue?",
+            default = "no",
+        )
+        if confirmation:
+            sys.exit()
+    else:
+        sys.exit()
+
+# Exit the program properly when closing the window or pressing Alt+F4
+main_window.bind("<Alt-F4>", clean_exit)
+main_window.protocol("WM_DELETE_WINDOW", clean_exit)
+"""NOTE
+Those bindings are necessary because Matplotlib does not automatically close
+the plots when the window is closed. That would cause the program to hang on
+the shell.
+"""
+
+#-----------------------------------------------------------------------------
+# Menu bar
+#-----------------------------------------------------------------------------
+
+# Disable detachable menus
+main_window.option_add("*tearOff", tk.FALSE)
+
+# Create menu bar on the main window
+menubar = tk.Menu(main_window)
+main_window["menu"] = menubar
+
+# Create top level menus
+menu_file = tk.Menu(menubar)
+menu_edit = tk.Menu(menubar)
+menu_help = tk.Menu(menubar)
+menubar.add_cascade(menu=menu_file, label="File")
+menubar.add_cascade(menu=menu_edit, label="Edit")
+menubar.add_cascade(menu=menu_help, label="Help")
+
+# Add File commands
+menu_file.add_command(
+    label = "Add spectra to diagram...",
+    command = spectrum_box.import_files,
+    accelerator = "Ctrl+O",
+)
+menu_file.add_command(
+    label = "New diagram",
+    accelerator = "Ctrl+N",
+    # command = ,
+)
+
+menu_file.add_separator()
+
+menu_file.add_command(
+    label = "Save figure...",
+    accelerator = "Ctrl+S",
+    # command = ,
+)
+
+menu_file.add_command(
+    label = "Save coordinates to text...",
+    accelerator = "Ctrl+T",
+    # command = ,
+)
+
+menu_file.add_separator()
+
+menu_file.add_command(
+    label = "Close",
+    accelerator = "Alt+F4",
+    command = clean_exit,
+)
+
+# Add Edit commands
+show_gridlines = tk.BooleanVar()
+show_gridlines.set(True)
+menu_edit.add_checkbutton(
+    label = "Show grid lines",
+    variable = show_gridlines,
+    onvalue = True,
+    offvalue = False,
+    accelerator = "F2",
+    #command = ,
+)
+
+show_axis = tk.BooleanVar()
+show_axis.set(True)
+menu_edit.add_checkbutton(
+    label = "Show axis",
+    variable = show_axis,
+    onvalue = True,
+    offvalue = False,
+    accelerator = "F3",
+    #command = ,
+)
+
+show_locus = tk.BooleanVar()
+show_locus.set(True)
+menu_edit.add_checkbutton(
+    label = "Show spectral locus",
+    variable = show_locus,
+    onvalue = True,
+    offvalue = False,
+    accelerator = "F4",
+    #command = ,
+)
+
+menu_edit.add_separator()
+
+menu_edit.add_command(
+    label = "Delete selected spectra",
+    accelerator = "Del",
+    #command = ,
+)
+menu_edit.add_command(
+    label = "Delete all spectra",
+    #command = ,
+)
+
+# Add Help commands
+menu_help.add_command(
+    label = "Help",
+    accelerator = "F1",
+    # command = ,
+)
+
+menu_help.add_separator()
+
+menu_help.add_command(
+    label = "About",
+    # command = ,
+)
 
 #-----------------------------------------------------------------------------
 # Button to load spectrum files
