@@ -2,7 +2,8 @@ import tkinter as tk
 import tkinter.ttk as ttk
 from tkinter.messagebox import askyesno
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
-from matplotlib.pyplot import close as plot_close
+import matplotlib as mpl
+import os
 import sys
 from spec2cie import (spectrum_container, plot_container)
 
@@ -63,7 +64,7 @@ spectrum_CIE_dict = {}      # Dictionary to associate each plotted point to its 
 # --- Update the window when new files are successfully loaded ---#
 
 def update_spectrum_window(event):
-    global spectrum_count, spectrum_CIEx, spectrum_CIEy, spectrum_CIE_dict, spectrum_box, canvas
+    global spectrum_count, spectrum_CIEx, spectrum_CIEy, spectrum_CIE_dict, spectrum_box, canvas, confirm_exit
 
     count_start = spectrum_count
 
@@ -124,13 +125,16 @@ def update_spectrum_window(event):
     plot.plot_cie(spectrum_CIEx[count_start:spectrum_count], spectrum_CIEy[count_start:spectrum_count])
     canvas.draw()
 
+    # Turn on exit confirmation
+    confirm_exit = True
+
 # Bind the update function to the "Files Imported" event
 main_window.bind("<<FilesImported>>", update_spectrum_window)
 
 
 #--- Exit the program ---#
 
-confirm_exit = True    # Will be set to True when a file is imported and to False when a file is saved
+confirm_exit = False    # Will be set to True when a file is imported and to False when a file is saved
 
 # As the user if they want to close the program, when there are still stuff to save
 def clean_exit(*event):
@@ -153,6 +157,17 @@ Those bindings are necessary because Matplotlib does not automatically close
 the plots when the window is closed. That would cause the program to hang on
 the shell.
 """
+
+#--- Saving the CIE diagram ---#
+
+def save_diagram():
+    toolbar.save_figure()
+
+def disable_exit_confirmation(*event):
+    global confirm_exit
+    confirm_exit = False
+
+main_window.bind("<<FigureSaved>>", disable_exit_confirmation)
 
 #-----------------------------------------------------------------------------
 # Menu bar
@@ -188,14 +203,14 @@ menu_file.add_command(
 menu_file.add_separator()
 
 menu_file.add_command(
-    label = "Save figure...",
+    label = "Save diagram...",
     accelerator = "Ctrl+S",
-    # command = ,
+    command = save_diagram,
 )
 
 menu_file.add_command(
-    label = "Save coordinates to text...",
-    accelerator = "Ctrl+T",
+    label = "Export coordinates...",
+    accelerator = "Ctrl+E",
     # command = ,
 )
 
@@ -230,11 +245,11 @@ menu_edit.add_checkbutton(
     #command = ,
 )
 
-show_locus = tk.BooleanVar()
-show_locus.set(True)
+show_labels = tk.BooleanVar()
+show_labels.set(True)
 menu_edit.add_checkbutton(
-    label = "Show spectral locus",
-    variable = show_locus,
+    label = "Show labels",
+    variable = show_labels,
     onvalue = True,
     offvalue = False,
     accelerator = "F4",
@@ -395,7 +410,57 @@ frame_cie.grid(
 
 canvas.draw()
 
-toolbar = NavigationToolbar2Tk(canvas, main_window, pack_toolbar=False)
+# Modify the save_figure() method of the  avigationToolbar2Tk class
+"""NOTE
+The only change I am making is to add en event generated when the figure is successfully saved.
+That event is used to toggle off the exit confirmation after the figure is saved.
+"""
+class NavigationToolbar2Tk_modified(NavigationToolbar2Tk):
+    def save_figure(self, *args):
+        filetypes = self.canvas.get_supported_filetypes().copy()
+        default_filetype = self.canvas.get_default_filetype()
+
+        # Tk doesn't provide a way to choose a default filetype,
+        # so we just have to put it first
+        default_filetype_name = filetypes.pop(default_filetype)
+        sorted_filetypes = ([(default_filetype, default_filetype_name)]
+                            + sorted(filetypes.items()))
+        tk_filetypes = [(name, '*.%s' % ext) for ext, name in sorted_filetypes]
+
+        # adding a default extension seems to break the
+        # asksaveasfilename dialog when you choose various save types
+        # from the dropdown.  Passing in the empty string seems to
+        # work - JDH!
+        #defaultextension = self.canvas.get_default_filetype()
+        defaultextension = ''
+        initialdir = os.path.expanduser(mpl.rcParams['savefig.directory'])
+        initialfile = self.canvas.get_default_filename()
+        fname = tk.filedialog.asksaveasfilename(
+            master=self.canvas.get_tk_widget().master,
+            title='Save the figure',
+            filetypes=tk_filetypes,
+            defaultextension=defaultextension,
+            initialdir=initialdir,
+            initialfile=initialfile,
+            )
+
+        if fname in ["", ()]:
+            return
+        # Save dir for next time, unless empty str (i.e., use cwd).
+        if initialdir != "":
+            mpl.rcParams['savefig.directory'] = (
+                os.path.dirname(str(fname)))
+        try:
+            # This method will handle the delegation to the correct type
+            self.canvas.figure.savefig(fname)
+            """ Change begin """
+            self.window.event_generate("<<FigureSaved>>", when="tail")
+            self.window.update()
+            """ Change end """
+        except Exception as e:
+            tk.messagebox.showerror("Error saving file", str(e))
+
+toolbar = NavigationToolbar2Tk_modified(canvas, main_window, pack_toolbar=False)
 toolbar.update()
 toolbar.grid(
     column = 1,
