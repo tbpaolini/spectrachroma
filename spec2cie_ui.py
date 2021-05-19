@@ -58,6 +58,20 @@ spectrum_CIEy = []          # List the y CIE color coordinate for each spectrum
 spectrum_CIE_dict = {}      # Dictionary to associate each plotted point to its spectrum
 
 #-----------------------------------------------------------------------------
+# Global flags
+#-----------------------------------------------------------------------------
+
+confirm_exit = False                # Confirm wheter the user wants to close the program
+                                    # This will be set to True when a file is imported and to False when a file is saved
+
+show_gridlines = tk.BooleanVar()    # Display the grid lines on the Chromaticity Diagram (Default: False)
+show_gridlines.set(False)
+show_axis = tk.BooleanVar()         # Display the axis (x and y) and the bounding box on the diagram (Default: True)
+show_axis.set(True)
+show_labels = tk.BooleanVar()       # Display the numbering on each point of the graph (Default: True)
+show_labels.set(True)
+
+#-----------------------------------------------------------------------------
 # Callback functions
 #-----------------------------------------------------------------------------
 
@@ -133,8 +147,6 @@ main_window.bind("<<FilesImported>>", update_spectrum_window)
 
 
 #--- Exit the program ---#
-
-confirm_exit = False    # Will be set to True when a file is imported and to False when a file is saved
 
 # As the user if they want to close the program, when there are still stuff to save
 def clean_exit(*event):
@@ -223,8 +235,6 @@ menu_file.add_command(
 )
 
 # Add Edit commands
-show_gridlines = tk.BooleanVar()
-show_gridlines.set(True)
 menu_edit.add_checkbutton(
     label = "Show grid lines",
     variable = show_gridlines,
@@ -234,8 +244,6 @@ menu_edit.add_checkbutton(
     #command = ,
 )
 
-show_axis = tk.BooleanVar()
-show_axis.set(True)
 menu_edit.add_checkbutton(
     label = "Show axis",
     variable = show_axis,
@@ -245,8 +253,6 @@ menu_edit.add_checkbutton(
     #command = ,
 )
 
-show_labels = tk.BooleanVar()
-show_labels.set(True)
 menu_edit.add_checkbutton(
     label = "Show labels",
     variable = show_labels,
