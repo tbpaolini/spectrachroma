@@ -162,7 +162,7 @@ main_window.bind("<<FigureSaved>>", disable_exit_confirmation)
 def update_color_info(event):
     """ Updates automatically the color information frame when the user select a single spectrum.
     """
-    global cell_x_value_text, cell_y_value_text, cell_z_value_text
+    global cell_spectrum_title, cell_x_value_text, cell_y_value_text, cell_z_value_text
 
     selected = tree_spectrum.selection()
     if len(selected) != 1:
@@ -183,6 +183,9 @@ def update_color_info(event):
 
     point = selected[0]
     spectrum = spectrum_CIE_dict[point]
+
+    # Display the spectrum's title
+    cell_spectrum_title["text"] = tree_spectrum.item(point, option="text")
 
     # Get CIE coordinates from the Treeview and display them on the color info frame
     CIE = tree_spectrum.item(point, option="values")
@@ -249,7 +252,7 @@ menubar.add_cascade(menu=menu_help, label="Help")
 
 # Add File commands
 menu_file.add_command(
-    label = "Add spectra to diagram...",
+    label = "Import spectra...",
     command = spectrum_box.import_files,
     accelerator = "Ctrl+O",
 )
@@ -341,7 +344,15 @@ menu_help.add_command(
 
 frame_color_info = tk.LabelFrame(
     master = main_window,
-    text = "Color coordinates"
+    text = "Color coordinate"
+)
+
+# Spectrum name
+
+cell_spectrum_title = tk.Label(
+    master = frame_color_info,
+    text = "Please import spectra (Ctrl+O or File menu)",
+    anchor = "w",
 )
 
 # Coordinates names
@@ -388,36 +399,44 @@ cell_color_display = tk.Label(
 
 cell_padding = 5
 
-cell_x_name.grid(
+cell_spectrum_title.grid(
     column = 0,
     row = 0,
+    columnspan = 3,
+    sticky = "we",
+    padx = cell_padding,
+)
+
+cell_x_name.grid(
+    column = 0,
+    row = 1,
     padx = cell_padding,
 )
 cell_y_name.grid(
     column = 0,
-    row = 1,
+    row = 2,
     padx = cell_padding,
 )
 cell_z_name.grid(
     column = 0,
-    row = 2,
+    row = 3,
     padx = cell_padding,
 )
 cell_x_value.grid(
     column = 1,
-    row = 0,
+    row = 1,
 )
 cell_y_value.grid(
     column = 1,
-    row = 1,
+    row = 2,
 )
 cell_z_value.grid(
     column = 1,
-    row = 2,
+    row = 3,
 )
 cell_color_display.grid(
     column = 2,
-    row = 0,
+    row = 1,
     rowspan = 3,
     sticky = "nsew",
     padx = cell_padding,
