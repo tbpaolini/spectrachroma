@@ -158,6 +158,51 @@ def disable_exit_confirmation(*event):
 main_window.bind("<<FigureSaved>>", disable_exit_confirmation)
 
 
+# --- Updating the color information frame
+def update_color_info(event):
+    """ Updates automatically the color information frame when the user select a single spectrum.
+    """
+    global cell_x_value_text, cell_y_value_text, cell_z_value_text
+
+    selected = tree_spectrum.selection()
+    if len(selected) != 1:
+        return False
+    """NOTE
+    I am doing the logic based on the selected items, instead of the focused item
+    because of two reasons:
+      1. It's more obvious to the user which item is active, because the focus is shown more subtly
+      2. In order for the focus to work, the user would need to click on the Treeview.
+         I want the information to update automatically to the latest imported spectrum, and that
+         wouldn't happen if it was based on focus (item focus cannot change unless the Treeview is
+         also focused).
+    
+    I am checking if exactly one item is selected so the frame does not keep updating while the user
+    is doing a multiple selection with Ctrl held and clicking. That would be annoying and potentially
+    also slow down the selection.
+    """
+
+    point = selected[0]
+    spectrum = spectrum_CIE_dict[point]
+
+    # Get CIE coordinates from the Treeview and display them on the color info frame
+    CIE = tree_spectrum.item(point, option="values")
+    cell_x_value_text.set(CIE[0])
+    cell_y_value_text.set(CIE[1])
+    cell_z_value_text.set(CIE[2])
+
+    # Get the RGB color from the spectrum and display the color
+    color_RGB = [int(255 * color) for color in spectrum.RGB]    # Integer list [Red, Green, Blue] on the 0..255 range
+
+    color_hex = hex((color_RGB[0] << 16) | (color_RGB[1] << 8) | (color_RGB[2]))    # Convert the color values to hexadecimal
+    color_hex = color_hex.replace("0x", "", 1)  # Remove the "0x" from the beginning
+    color_hex = color_hex.rjust(6, "0")         # Ensure that the string is 6 characters long (fill with leading "0", if needed)
+    color_hex = "#" + color_hex                 # Add a "#" to the beginning
+    cell_color_display["bg"] = color_hex        # Display the color
+
+# Bind the function to the Treeview Select event
+main_window.bind("<<TreeviewSelect>>", update_color_info)
+
+
 #--- Exiting the program ---#
 
 # As the user if they want to close the program, when there are still stuff to save
@@ -318,14 +363,18 @@ cell_z_name = tk.Label(
 
 cell_value_arguments = dict(
     master = frame_color_info,
-    state = tk.DISABLED,
-    disabledbackground = "#f8f8f8",
-    disabledforeground = "black",
+    state = "readonly",
+    readonlybackground = "#f8f8f8",
+    foreground = "black",
 )
 
-cell_x_value = tk.Entry(**cell_value_arguments)
-cell_y_value = tk.Entry(**cell_value_arguments)
-cell_z_value = tk.Entry(**cell_value_arguments)
+cell_x_value_text = tk.StringVar()
+cell_y_value_text = tk.StringVar()
+cell_z_value_text = tk.StringVar()
+
+cell_x_value = tk.Entry(textvariable=cell_x_value_text, **cell_value_arguments)
+cell_y_value = tk.Entry(textvariable=cell_y_value_text, **cell_value_arguments)
+cell_z_value = tk.Entry(textvariable=cell_z_value_text, **cell_value_arguments)
 
 # Label to display the color itself
 
