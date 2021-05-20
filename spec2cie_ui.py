@@ -291,18 +291,101 @@ menu_help.add_command(
 )
 
 #-----------------------------------------------------------------------------
-# Button to load spectrum files
+# Color information frame
 #-----------------------------------------------------------------------------
 
-button_open_files = tk.Button(
+frame_color_info = tk.LabelFrame(
     master = main_window,
-    text = "Open files",
-    command = spectrum_box.import_files
+    text = "Color data"
 )
-button_open_files.grid(
+
+# Coordinates names
+
+cell_x_name = tk.Label(
+    master = frame_color_info,
+    text = "CIE x =",
+)
+cell_y_name = tk.Label(
+    master = frame_color_info,
+    text = "CIE y =",
+)
+cell_z_name = tk.Label(
+    master = frame_color_info,
+    text = "CIE z =",
+)
+
+# Coordinates values (can be copied by the user)
+
+cell_value_arguments = dict(
+    master = frame_color_info,
+    state = tk.DISABLED,
+    disabledbackground = "#f8f8f8",
+    disabledforeground = "black",
+)
+
+cell_x_value = tk.Entry(**cell_value_arguments)
+cell_y_value = tk.Entry(**cell_value_arguments)
+cell_z_value = tk.Entry(**cell_value_arguments)
+
+# Label to display the color itself
+
+cell_color_display = tk.Label(
+    master = frame_color_info,
+    borderwidth = 1,
+    relief = tk.SUNKEN,
+)
+
+# Adding the cells to the frame
+
+cell_padding = 5
+
+cell_x_name.grid(
     column = 0,
     row = 0,
-    sticky = "snw",
+    padx = cell_padding,
+)
+cell_y_name.grid(
+    column = 0,
+    row = 1,
+    padx = cell_padding,
+)
+cell_z_name.grid(
+    column = 0,
+    row = 2,
+    padx = cell_padding,
+)
+cell_x_value.grid(
+    column = 1,
+    row = 0,
+)
+cell_y_value.grid(
+    column = 1,
+    row = 1,
+)
+cell_z_value.grid(
+    column = 1,
+    row = 2,
+)
+cell_color_display.grid(
+    column = 2,
+    row = 0,
+    rowspan = 3,
+    sticky = "nsew",
+    padx = cell_padding,
+    ipady = cell_padding,
+)
+
+frame_color_info.columnconfigure(
+    2,
+    weight = 1,
+)
+
+# Add the frame to the main window
+frame_color_info.grid(
+    column = 0,
+    row = 0,
+    rowspan = 2,
+    sticky = "nsew",
 )
 
 
