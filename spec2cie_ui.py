@@ -341,7 +341,7 @@ menu_help.add_command(
 
 frame_color_info = tk.LabelFrame(
     master = main_window,
-    text = "Color data"
+    text = "Color coordinates"
 )
 
 # Coordinates names
@@ -435,6 +435,8 @@ frame_color_info.grid(
     row = 0,
     rowspan = 2,
     sticky = "nsew",
+    padx = 3,
+    pady = 3,
 )
 
 
