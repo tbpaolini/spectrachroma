@@ -218,7 +218,8 @@ class spectrum_container():
 
         file_list = askopenfilenames(
             parent = self.window,
-            filetypes = (("Text files", "*.txt;*.csv;*.prn;*.dat"), ("All files", "*.*"))
+            filetypes = (("Text files", "*.txt;*.csv;*.prn;*.dat"), ("All files", "*.*")),
+            title = "Import spectra"
         )
 
         file_list_size = len(file_list)

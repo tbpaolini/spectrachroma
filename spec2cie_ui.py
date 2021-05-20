@@ -146,12 +146,25 @@ def update_spectrum_window(event):
 main_window.bind("<<FilesImported>>", update_spectrum_window)
 
 
-#--- Exit the program ---#
+#--- Saving the CIE diagram ---#
+
+def save_diagram():
+    toolbar.save_figure()
+
+def disable_exit_confirmation(*event):
+    global confirm_exit
+    confirm_exit = False
+
+main_window.bind("<<FigureSaved>>", disable_exit_confirmation)
+
+
+#--- Exiting the program ---#
 
 # As the user if they want to close the program, when there are still stuff to save
 def clean_exit(*event):
     if confirm_exit:
         confirmation = askyesno(
+            master = main_window,
             title = "Confirm exit",
             message = "Unsaved data will be lost. Continue?",
             default = "no",
@@ -169,17 +182,6 @@ Those bindings are necessary because Matplotlib does not automatically close
 the plots when the window is closed. That would cause the program to hang on
 the shell.
 """
-
-#--- Saving the CIE diagram ---#
-
-def save_diagram():
-    toolbar.save_figure()
-
-def disable_exit_confirmation(*event):
-    global confirm_exit
-    confirm_exit = False
-
-main_window.bind("<<FigureSaved>>", disable_exit_confirmation)
 
 #-----------------------------------------------------------------------------
 # Menu bar
