@@ -405,38 +405,43 @@ class plot_container():
             )
     
     def plot_cie(self, CIEx, CIEy):
+        """Take lists of CIE x an CIE y coordinates, and plot them on the Chromaticity diagram.
+        """
+        # Lenght of the lists
         len_CIEx = len(CIEx)
         len_CIEy = len(CIEy)
 
         if (len_CIEx == 0) or (len_CIEx != len_CIEy):
-            return False
+            return False    # Exit the function if the lists are empty or have different sizes
         
+        # Plot the points to the Chromaticity Diagram
         self.ax_CIE.scatter(CIEx, CIEy, marker="o", color="#212121", s=3)
         #print(f"About to annotate points:\n{CIEx}\n{CIEy}")
 
+        # Annotate with numbers the points on the diagram 
         point_index = 0
         for point in range(self.points_count, self.points_count + len_CIEx):
 
-            self.ax_CIE.annotate(point + 1,
+            self.ax_CIE.annotate(point + 1,     # The number of the current point
                 color = "white",
-                xy = (CIEx[point_index], CIEy[point_index]),
-                xytext = (0, 0),
-                textcoords = "offset points",
-                ha = "center",
-                va = "center",
-                fontfamily = "sans-serif",
-                fontweight = "bold",
-                fontsize = 6,
+                xy = (CIEx[point_index], CIEy[point_index]),    # Coordinate of the point
+                xytext = (0, 0),                                # Place the text on the same coordinate as the point
+                textcoords = "offset points",                   # Coordinates relative to the point
+                ha = "center",                                  # Center the text over the point (horizontally)
+                va = "center",                                  # Center the text over the point (vertically)
+                fontfamily = "sans-serif",                      # Use a font without serif
+                fontweight = "bold",                            # Bold text
+                fontsize = 6,                                   # Text with size of 6 points
                 bbox = dict(
-                    boxstyle = "circle",
-                    color = "#212121",
+                    boxstyle = "circle",                        # Place the text in a solid circle
+                    color = "#212121",                          # Color of the circle
                 )
             )
 
             #print(f"Point: {(CIEx[point_index], CIEy[point_index])} (index: {point_index})")
             point_index += 1
         
-        self.points_count += len_CIEx
+        self.points_count += len_CIEx   # How many points there are currently on the diagram
     
     def __del__(self):
         """Ensure that the plots get closed when the object is deleted.
