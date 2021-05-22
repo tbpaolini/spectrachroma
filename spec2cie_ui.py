@@ -27,7 +27,7 @@ main_window.columnconfigure(
 # Right column - CIE Chromaticity Diagram
 main_window.columnconfigure(
     1,
-    weight = 1,
+    weight = 2,
     minsize = 540,
 )
 
@@ -39,23 +39,31 @@ main_window.rowconfigure(
 
 # Next two rows (left column) - Tables
 main_window.rowconfigure(
+    # Color information table
     1,
-    weight = 1,
+    weight = 0,
 )
 main_window.rowconfigure(
+    # Treeview table
     2,
     weight = 1,
 )
 
 #-----------------------------------------------------------------------------
-# Initialise the spectrum container
+# Initialise the containers
 #-----------------------------------------------------------------------------
 
+# Spectrum container
 spectrum_box = spectrum_container(tk_window=main_window)
 spectrum_count = 0          # How many spectra are stored in the container
 spectrum_CIEx = []          # List the x CIE color coordinate for each spectrum
 spectrum_CIEy = []          # List the y CIE color coordinate for each spectrum
 spectrum_CIE_dict = {}      # Dictionary to associate each plotted point to its spectrum
+
+# Container for the Chromaticity Diagram and the Spectral Distribution
+plot = plot_container()
+current_sd = None           # Which Spectral Distribution is being shown
+previous_sd = None          # Which Spectral Distribution was shown last (so it can be hidden when a new one is shown)
 
 #-----------------------------------------------------------------------------
 # Global flags
@@ -78,7 +86,7 @@ show_labels.set(True)
 # --- Update the window when new files are successfully loaded ---#
 
 def update_spectrum_window(event):
-    global spectrum_count, spectrum_CIEx, spectrum_CIEy, spectrum_CIE_dict, spectrum_box, canvas, confirm_exit
+    global spectrum_count, spectrum_CIEx, spectrum_CIEy, spectrum_CIE_dict, spectrum_box, canvas_CIE, confirm_exit
 
     count_start = spectrum_count
 
@@ -137,7 +145,10 @@ def update_spectrum_window(event):
 
     # Plot the point to the spectra
     plot.plot_cie(spectrum_CIEx[count_start:spectrum_count], spectrum_CIEy[count_start:spectrum_count])
-    canvas.draw()
+    canvas_CIE.draw()
+
+    # Create the spectral distribution for each new spectrum
+    plot.plot_sd(spectrum_box[count_start:spectrum_count])
 
     # Turn on exit confirmation
     confirm_exit = True
@@ -162,7 +173,8 @@ main_window.bind("<<FigureSaved>>", disable_exit_confirmation)
 def update_color_info(event):
     """ Updates automatically the color information frame when the user select a single spectrum.
     """
-    global cell_spectrum_title, cell_x_value_text, cell_y_value_text, cell_z_value_text
+    global cell_spectrum_title, cell_x_value_text, cell_y_value_text, cell_z_value_text, canvas_sd, \
+        current_sd, previous_sd
 
     selected = tree_spectrum.selection()
     if len(selected) != 1:
@@ -201,6 +213,14 @@ def update_color_info(event):
     color_hex = color_hex.rjust(6, "0")         # Ensure that the string is 6 characters long (fill with leading "0", if needed)
     color_hex = "#" + color_hex                 # Add a "#" to the beginning
     cell_color_display["bg"] = color_hex        # Display the color
+
+    # Update the Spectral Distribution
+    previous_sd = current_sd            # Store the previous Spectral Distribution
+    current_sd = plot.ax_sd[spectrum]   # Get the current distribution
+    if previous_sd:
+        previous_sd.set_visible(False)  # Switch off the previous distribution
+    current_sd.set_visible(True)        # Switch on the current distribution
+    canvas_sd.draw()                    # Update the canvas so the distribution is show
 
 # Bind the function to the Treeview Select event
 main_window.bind("<<TreeviewSelect>>", update_color_info)
@@ -271,7 +291,7 @@ menu_file.add_command(
 )
 
 menu_file.add_command(
-    label = "Export coordinates...",
+    label = "Export all coordinates...",
     accelerator = "Ctrl+E",
     # command = ,
 )
@@ -393,6 +413,33 @@ cell_color_display = tk.Label(
     master = frame_color_info,
     borderwidth = 1,
     relief = tk.SUNKEN,
+)
+
+# Spectral distribution
+
+frame_sd = tk.Frame(
+    master = frame_color_info,
+    borderwidth = 2,
+    relief = tk.SUNKEN,
+    width = 280,
+    height = 210,
+)
+
+# Create the canvas for the Spectral Distribution
+canvas_sd = canvas_sd = FigureCanvasTkAgg(plot.fig_sd, master = frame_sd)
+
+canvas_sd.get_tk_widget().pack(
+        expand = True,
+        fill = tk.Y,
+    )
+
+frame_sd.grid(
+    column = 0,
+    row = 4,
+    columnspan = 3,
+    sticky = "ns",
+    padx = 3,
+    pady = 3,
 )
 
 # Adding the cells to the frame
@@ -552,9 +599,8 @@ frame_cie = tk.Frame(
     borderwidth = 2,
     relief = tk.SUNKEN,
 )
-plot = plot_container()
-canvas = FigureCanvasTkAgg(plot.fig_CIE, master = frame_cie)
-canvas.get_tk_widget().pack(
+canvas_CIE = FigureCanvasTkAgg(plot.fig_CIE, master = frame_cie)
+canvas_CIE.get_tk_widget().pack(
     expand = True,
     fill = tk.BOTH,
 )
@@ -569,7 +615,7 @@ frame_cie.grid(
     pady = 3,
 )
 
-canvas.draw()
+canvas_CIE.draw()
 
 # Modify the save_figure() method of the  avigationToolbar2Tk class
 """NOTE
@@ -621,7 +667,7 @@ class NavigationToolbar2Tk_modified(NavigationToolbar2Tk):
         except Exception as e:
             tk.messagebox.showerror("Error saving file", str(e))
 
-toolbar = NavigationToolbar2Tk_modified(canvas, main_window, pack_toolbar=False)
+toolbar = NavigationToolbar2Tk_modified(canvas_CIE, main_window, pack_toolbar=False)
 toolbar.update()
 toolbar.grid(
     column = 1,

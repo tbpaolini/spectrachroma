@@ -403,6 +403,22 @@ class plot_container():
                     shrinkB = 2,                # Distance the line head is from the diagram
                 )
             )
+        
+        # Initialize the figure for the spectral distributions (sd)
+        """NOTE
+        To speed up things, I am using a single figure with multiple axes (one for each sd).
+        Then I will make the figure to render only one axis at a time.
+        """
+        self.fig_sd = plt.figure(
+            figsize = (2.8, 2.1),
+            dpi = 100,
+        )
+        
+        self.ax_sd = {}    # Spectral Distribution dictionary
+        """NOTE
+        The dictionary will associate the spectrum ID to its axis on the sd figure:
+        {spectrum: sd_axis, ...}
+        """
     
     def plot_cie(self, CIEx, CIEy):
         """Take lists of CIE x an CIE y coordinates, and plot them on the Chromaticity diagram.
@@ -443,10 +459,38 @@ class plot_container():
         
         self.points_count += len_CIEx   # How many points there are currently on the diagram
     
+    def plot_sd(self, spectrum_list):
+        """Plot a Spectral Distribution for each spectrum in a list.
+        """
+        
+        if len(spectrum_list) == 0:
+            return False
+        
+        for spectrum in spectrum_list:
+            
+            # Create the axis
+            current_axis = self.fig_sd.subplots(sharex=True, sharey=True)
+            current_axis.set_visible(False)
+            
+            # Plot the current spectral distribution
+            plot_single_sd(
+                spectrum.spectrum_corrected,        # Interpolated spectrum
+                figure = self.fig_sd,
+                axes = current_axis,
+                axes_visible = False,               # No bounding box around the spectrum
+                title = False,                      # No title
+                standalone = False,
+                transparent_background = False,     # No background
+            )
+            
+            # Update dictionary of spectral distributions
+            self.ax_sd.update({spectrum: current_axis})
+    
     def __del__(self):
         """Ensure that the plots get closed when the object is deleted.
         """
-        plt.close(self.fig_CIE)
+        # Close all figures
+        plt.close("all")
 
 
 # get_spectrum_from_file(r"C:\Users\Tiago\Desktop\Python\Projetos\Espectros brutos\C3EUTTM1.txt")
@@ -512,114 +556,16 @@ if len(teste) > 0:
 
 plt.rcParams['savefig.dpi'] = 300
 
-fig_CIE, ax_CIE = plt.subplots(
-    figsize = (6.4, 6.4),
-    dpi = 100,
-)
-
-plot_chromaticity_diagram_CIE1931(
-    figure = fig_CIE,
-    axes = ax_CIE,
-    standalone=False,
-    title="CIE 1931 Chromaticity Diagram",
-    bounding_box = (0, 0.8, 0.0, 0.9),
-    tight_layout = True,
+fig_sd, ax_sd = plot_single_sd(
+    teste[0].spectrum_corrected,
+    axes_visible = False,
+    title = False,
+    standalone = False,
     transparent_background = False,
-    show_spectral_locus = False,
 )
 
-fig_CIE.set_facecolor("black")
-ax_CIE.set_facecolor("black")
+# ax_sd_title = ax_sd.set_title("Spectral Distribution")
+# ax_sd_title.set_visible(False)
+# ax_sd.axis("on")
 
-ax_CIE.set_title(
-    ax_CIE.get_title(),
-    color = "white",
-    fontweight = "bold",
-    fontsize = "x-large",
-    pad = 10,
-)
-
-ax_CIE.spines["bottom"].set_color("white")
-ax_CIE.spines["top"].set_color("white")
-ax_CIE.spines["left"].set_color("white")
-ax_CIE.spines["right"].set_color("white")
-
-ax_CIE.set_xlabel(
-    ax_CIE.get_xlabel(),
-    color = "white",
-    fontsize = "medium",
-    labelpad = 5,
-)
-
-ax_CIE.set_ylabel(
-    ax_CIE.get_ylabel(),
-    color = "white",
-    fontsize = "medium",
-    labelpad = 5,
-)
-
-ax_CIE.tick_params(axis="x", colors="white")
-ax_CIE.tick_params(axis="y", colors="white")
-
-
-wave_labels = {
-    450: (0.15664093257730705, 0.017704804990891335),
-    470: (0.12411847672778557, 0.057802513373740476),
-    480: (0.091293507002271151, 0.13270204248699027),
-    520: (0.074302424773374967, 0.83380309134022801),
-    540: (0.2296196726496402, 0.75432908990274372),
-    560: (0.37310154386845751, 0.62445085979666115),
-    580: (0.5124863667817966, 0.48659078806085709),
-    600: (0.62703659976387227, 0.37249114521841825),
-    620: (0.69150397296170174, 0.30834226055665592),
-    700: (0.7346900232582807, 0.2653099767417193)
-}
-
-for point in wave_labels:
-    if point < 520:
-        my_xytext = (-10, 0)
-        my_va = "center"
-        my_ha = "right"
-    elif point > 520:
-        my_xytext = (10, 0)
-        my_va = "center"
-        my_ha = "left"
-    else:
-        my_xytext = (10, 10)
-        my_va = "bottom"
-        my_ha = "center"
-    
-    ax_CIE.annotate(
-        point,
-        xy = wave_labels[point],
-        xytext = my_xytext,
-        textcoords = "offset points",
-        color = "white",
-        fontsize = 9,
-        va = my_va,
-        ha = my_ha,
-        arrowprops = dict(
-            color = "white",
-            arrowstyle = "-"
-        )
-    )
-
-ax_CIE.scatter(teste[0].xy[0], teste[0].xy[1], marker="o", color="#212121", s=80)
-
-ax_CIE.annotate("1",
-             color = "white",
-             xy=teste[0].xy,
-             xytext=(0, 0),
-             textcoords='offset points',
-             ha = "center",
-             va = "center",
-             fontfamily = "sans-serif",
-             fontweight = "bold",
-             fontsize = "x-small",
-)
-
-plt.show()
-
-
-# plot_single_sd(teste[0].spectrum_raw)
-"""
+plt.show()"""
