@@ -14,7 +14,7 @@ from spec2cie import (spectrum_container, plot_container)
 main_window = tk.Tk()
 main_window.title("Spectrum to CIE 1931")
 #main_window.geometry("1024x700")
-#main_window.minsize(160, 90)
+main_window.minsize(840, 588)
 
 
 # Left column - Color and spectrum tables
@@ -41,7 +41,7 @@ main_window.rowconfigure(
 main_window.rowconfigure(
     # Color information table
     1,
-    weight = 0,
+    weight = 2,
 )
 main_window.rowconfigure(
     # Treeview table
@@ -430,14 +430,14 @@ canvas_sd = canvas_sd = FigureCanvasTkAgg(plot.fig_sd, master = frame_sd)
 
 canvas_sd.get_tk_widget().pack(
         expand = True,
-        fill = tk.Y,
+        fill = tk.BOTH,
     )
 
 frame_sd.grid(
     column = 0,
     row = 4,
     columnspan = 3,
-    sticky = "ns",
+    sticky = "nsew",
     padx = 3,
     pady = 3,
 )
@@ -492,6 +492,10 @@ cell_color_display.grid(
 
 frame_color_info.columnconfigure(
     2,
+    weight = 1,
+)
+frame_color_info.rowconfigure(
+    4,
     weight = 1,
 )
 

@@ -482,9 +482,16 @@ class plot_container():
                 standalone = False,
                 transparent_background = False,     # No background
             )
+
+            # Change the line width to 0.5 (from the default of 1.0)
+            (current_axis.get_lines()[0]).set_linewidth(0.5)
+            current_axis.set_xlim((380, 780))
             
             # Update dictionary of spectral distributions
             self.ax_sd.update({spectrum: current_axis})
+        
+        # Remove the blank spaces around the figure
+        self.fig_sd.subplots_adjust(left=0, bottom=0, right=1, top=1, wspace=0, hspace=0)
     
     def __del__(self):
         """Ensure that the plots get closed when the object is deleted.
