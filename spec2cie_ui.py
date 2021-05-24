@@ -328,6 +328,8 @@ def delete_selected_points(*event):
         plot.flush_cie()                                    # Clear the diagram's points
         if spectrum_count > 0:
             plot.plot_cie(spectrum_CIEx, spectrum_CIEy)     # Plot the points of the remaining spectra
+        else:
+            confirm_exit = False                            # Turn off exit confirmation if there are no remaining spectra
         canvas_CIE.draw()                                   # Update the diagram's canvas
 
         # Delete the selected items from the Treeview
@@ -388,6 +390,16 @@ def delete_selected_points(*event):
 
 # Bind the function to the Delete key
 main_window.bind("<Delete>", delete_selected_points)
+
+
+#--- Select all spectra ---#
+
+def select_all(*event):
+    all_items = tree_spectrum.get_children()
+    tree_spectrum.selection_set(all_items)
+
+# Bind the function to the Ctrl+A key combo
+main_window.bind("<Control-a>", select_all)
 
 
 #--- Exiting the program ---#
@@ -498,6 +510,11 @@ menu_edit.add_checkbutton(
 
 menu_edit.add_separator()
 
+menu_edit.add_command(
+    label = "Select all spectra",
+    accelerator = "Ctrl+A",
+    command = select_all,
+)
 menu_edit.add_command(
     label = "Remove selected spectra",
     accelerator = "Del",
