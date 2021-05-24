@@ -247,7 +247,7 @@ def reset_color_info(*event):
 
 #--- Deleting points from the diagram ---#
 
-def delete_selected_points(*event):
+def delete_selected(*event):
     """Remove from the diagram the points selected on the Treeview
     """
     
@@ -389,7 +389,7 @@ def delete_selected_points(*event):
         tree_spectrum.item(row, tags = format_tag, text = new_text)  # Apply the corresponding format tag
 
 # Bind the function to the Delete key
-main_window.bind("<Delete>", delete_selected_points)
+main_window.bind("<Delete>", delete_selected)
 
 
 #--- Select all spectra ---#
@@ -400,6 +400,13 @@ def select_all(*event):
 
 # Bind the function to the Ctrl+A key combo
 main_window.bind("<Control-a>", select_all)
+
+
+#--- Deleta all spectra ---#
+
+def delete_all():
+    select_all()
+    delete_selected()
 
 
 #--- Exiting the program ---#
@@ -518,11 +525,11 @@ menu_edit.add_command(
 menu_edit.add_command(
     label = "Remove selected spectra",
     accelerator = "Del",
-    command = delete_selected_points,
+    command = delete_selected,
 )
 menu_edit.add_command(
     label = "Remove all spectra",
-    #command = ,
+    command = delete_all,
 )
 
 # Add Help commands
