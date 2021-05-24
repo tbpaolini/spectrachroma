@@ -11,9 +11,9 @@ from spec2cie import (spectrum_container, plot_container)
 #-----------------------------------------------------------------------------
 
 main_window = tk.Tk()
-main_window.title("Spectrum to CIE 1931")
+main_window.title("SpectraChroma")
 #main_window.geometry("1024x700")
-main_window.minsize(840, 588)
+main_window.minsize(840, 590)
 
 
 # Left column - Color and spectrum tables
