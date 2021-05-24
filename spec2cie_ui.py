@@ -3,8 +3,7 @@ import tkinter.ttk as ttk
 from tkinter.messagebox import askyesno
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
 import matplotlib as mpl
-import os
-import sys
+import os, sys
 from spec2cie import (spectrum_container, plot_container)
 
 #-----------------------------------------------------------------------------
@@ -226,6 +225,171 @@ def update_color_info(event):
 main_window.bind("<<TreeviewSelect>>", update_color_info)
 
 
+#--- Clear the values of color info frame ---#
+
+def reset_color_info(*event):
+    """Remove the values from the color info frame.
+    This function will be called when no items on the Treeview are selected.
+    """
+    global previous_sd, current_sd
+    
+    cell_spectrum_title["text"] = "Please select or add a spectrum to display its color coordinate"
+    cell_x_value_text.set("")
+    cell_y_value_text.set("")
+    cell_z_value_text.set("")
+    cell_color_display["bg"] = "#f0f0f0"
+
+    current_sd.set_visible(False)
+    canvas_sd.draw()
+    current_sd = None
+    previous_sd = None
+
+
+#--- Deleting points from the diagram ---#
+
+def delete_selected_points(*event):
+    """Remove from the diagram the points selected on the Treeview
+    """
+    
+    # Get the current selection from the Treeview
+    selected_items = tree_spectrum.selection()
+    selected_amount = len(selected_items)
+
+    if selected_amount == 0:
+        return False
+    
+    # Whether the user is pressing the Shift key (True or False)
+    if len(event) > 0:
+        shift_key = bool(event[0].state & 0x0001)
+    else:
+        shift_key = False
+    """NOTE
+    The .state attribute returns a mask that tells which modifiers keys are active.
+    The hexadecimal mask 0x0001 corresponds to the Shift key, so I am performing
+    the bitwise AND to the state mask in order to check if the Shift key is active.
+    
+    The following page has a table of modifier key masks:
+    https://anzeljg.github.io/rin2/book2/2405/docs/tkinter/event-handlers.html
+    
+    The "event" argument isn't passed when the function is called through the
+    menu, only when the Delete key is pressed. So the items are only deleted
+    without confirmation if the user press Shift+Del
+    This behaviour is desired, since I always want a confirmation when deleting
+    through the menu.
+    """
+    
+    def do_deletion():
+        global confirm_exit, spectrum_count, spectrum_CIEx, spectrum_CIEy, spectrum_CIE_dict
+
+        # Delete the selected data from the containers
+        for item in selected_items:
+            spectrum = spectrum_CIE_dict[item]  # Spectrum handler
+            
+            # Remove spectrum from its container
+            spectrum_box.id.remove(spectrum)
+            
+            # Remove the spectral distribution from its container
+            plot.ax_sd[spectrum].remove()   # Delete axis
+            del plot.ax_sd[spectrum]        # Delete its entry on the axis dictionary
+            
+            # Remove spectrum from the CIE coordinates dictionary
+            del spectrum_CIE_dict[item]
+        
+        # Rebuild the lists of CIEx and CIEy coordinates
+        """NOTE
+        I am aware that those lists might be a little redundant with the spectrum_CIE_dict[], maybe
+        it would be easier to just associate each spectrum to its coordinates. However when I started
+        developing this program an ordered list just seemed to make more sense, and later it got clear
+        that a dictionary would be necessary.
+
+        Now I do not want to completely remove the lists, because that could break the file importing logic.
+        And also because reading the data from an ordered list is still faster than reading from an
+        unordered dictionary. So at the very least the file importing is more efficient, when speed is
+        concerned :-)
+
+        Just clearing and rebuilding the list from scratch should do the trick to keep data consistecy.
+        """
+        spectrum_CIEx.clear()
+        spectrum_CIEy.clear()
+        CIE_coordinate = spectrum_box.get_xy()
+        spectrum_CIEx.extend(CIE_coordinate["x"])
+        spectrum_CIEy.extend(CIE_coordinate["y"])
+        spectrum_count = len(spectrum_CIEx)
+
+        # Plot the remaining points to the Chromaticity Diagram
+        """NOTE
+        Similarly to above, just rebuilding the diagram's points is easier than removing only specific points and
+        renumbering them.
+
+        I am assuming that people will not import hundreds of spectra, which would make my approach ineficient.
+        But realistically speaking, there's no need to import that big amount. Usually what I saw was 4 or 5 at
+        most, but even with a few dozens spectra this program still run fast.
+        """
+        plot.flush_cie()                                    # Clear the diagram's points
+        if spectrum_count > 0:
+            plot.plot_cie(spectrum_CIEx, spectrum_CIEy)     # Plot the points of the remaining spectra
+        canvas_CIE.draw()                                   # Update the diagram's canvas
+
+        # Delete the selected items from the Treeview
+        tree_spectrum.delete(*selected_items)
+    
+    # Delete without confirmation if Shift is being held
+    if shift_key:
+        do_deletion()
+    
+    # Ask whether the user wants to delete the points
+    else:
+        # Confirmation message, based on if one or more items are selected
+        if selected_amount == 1:
+            item_name = spectrum_CIE_dict[selected_items[0]].file_name    # Name of the corresponding spectrum file
+            confirmation_message = f"{item_name} will be removed from the list and diagram. Continue?"
+        else:
+            confirmation_message = f"{selected_amount} items will be removed from the list and diagram. Continue?"
+        
+        # Display the confirmation dialog
+        confirmation = askyesno(
+            master = main_window,
+            title = "Confirm removal",
+            message = confirmation_message,
+            default = "no",
+        )
+
+        if confirmation:
+            # Delete items if the user chose "yes"
+            do_deletion()
+        else:
+            # Exit the function if the user chose "no"
+            return False
+    
+    # Reset the color info frame
+    reset_color_info()
+    
+    # Renumber and recolor the background of the Treeview's rows
+    # (so they still keep the alternate colors while being numbered sequentially from 1)
+    
+    remaining_rows = tree_spectrum.get_children()   # Get the rows present on the Treeview
+
+    for number,row in enumerate(remaining_rows):    # Enumerate the rows and loop through then
+        
+        if number % 2 == 1:         # Odd rows
+            format_tag = ("odd",)
+        else:                       # Even rows
+            format_tag = ("even",)
+        
+        old_text = tree_spectrum.item(row, option = "text")
+        new_text = f"{(number + 1):>2}{old_text.lstrip().lstrip('0123456789')}"
+        """NOTE
+        The first lstrip() only removes the spaces to the left,
+        while the next lstrip() removes the digits to the left.
+        """
+
+        # Apply the format tag and new text
+        tree_spectrum.item(row, tags = format_tag, text = new_text)  # Apply the corresponding format tag
+
+# Bind the function to the Delete key
+main_window.bind("<Delete>", delete_selected_points)
+
+
 #--- Exiting the program ---#
 
 # As the user if they want to close the program, when there are still stuff to save
@@ -335,12 +499,12 @@ menu_edit.add_checkbutton(
 menu_edit.add_separator()
 
 menu_edit.add_command(
-    label = "Delete selected spectra",
+    label = "Remove selected spectra",
     accelerator = "Del",
-    #command = ,
+    command = delete_selected_points,
 )
 menu_edit.add_command(
-    label = "Delete all spectra",
+    label = "Remove all spectra",
     #command = ,
 )
 

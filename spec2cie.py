@@ -404,6 +404,20 @@ class plot_container():
                 )
             )
         
+        # List for the point labels on the Chromaticity Diagram
+        """NOTE
+        Each point plotted on the diagram will have a number label over it.
+        This list will hold those labels handlers, so batch operations can be applied to them.
+        """
+        self.label_CIE = []
+
+        # List for the plotted coordinates
+        """NOTE
+        List to store each scatter plot of CIE coordinates, so operations can be applied later
+        to them.
+        """
+        self.scatter_CIE = []
+
         # Initialize the figure for the spectral distributions (sd)
         """NOTE
         To speed up things, I am using a single figure with multiple axes (one for each sd).
@@ -431,14 +445,15 @@ class plot_container():
             return False    # Exit the function if the lists are empty or have different sizes
         
         # Plot the points to the Chromaticity Diagram
-        self.ax_CIE.scatter(CIEx, CIEy, marker="o", color="#212121", s=3)
+        my_scatter = self.ax_CIE.scatter(CIEx, CIEy, marker="o", color="#212121", s=3)
+        self.scatter_CIE.append(my_scatter)
         #print(f"About to annotate points:\n{CIEx}\n{CIEy}")
 
         # Annotate with numbers the points on the diagram 
         point_index = 0
         for point in range(self.points_count, self.points_count + len_CIEx):
 
-            self.ax_CIE.annotate(point + 1,     # The number of the current point
+            my_label = self.ax_CIE.annotate(point + 1,          # The result of "point+1" is the text annotated to the current point
                 color = "white",
                 xy = (CIEx[point_index], CIEy[point_index]),    # Coordinate of the point
                 xytext = (0, 0),                                # Place the text on the same coordinate as the point
@@ -456,8 +471,28 @@ class plot_container():
 
             #print(f"Point: {(CIEx[point_index], CIEy[point_index])} (index: {point_index})")
             point_index += 1
+
+            # Add the label to the list
+            self.label_CIE.append(my_label)
         
         self.points_count += len_CIEx   # How many points there are currently on the diagram
+    
+    def flush_cie(self):
+        """Clear all plotted CIE points from the Chromaticity Diagram.
+        """
+        
+        # Remove all labels
+        for label in self.label_CIE:    # Loop through the list
+            label.remove()              # Remove the specific item
+        self.label_CIE.clear()          # Clear the entire list
+        
+        # Remove all plotted CIE coordinates
+        for scatter_plot in self.scatter_CIE:   # Loop through the list
+            scatter_plot.remove()               # Remove the specific item
+        self.scatter_CIE.clear()                # Clear the entire list
+
+        # Reset the points counter
+        self.points_count = 0
     
     def plot_sd(self, spectrum_list):
         """Plot a Spectral Distribution for each spectrum in a list.
