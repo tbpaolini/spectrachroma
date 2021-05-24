@@ -82,6 +82,14 @@ show_labels.set(True)
 # Callback functions
 #-----------------------------------------------------------------------------
 
+#--- Import spectra ---#
+
+def import_spectra(*event):
+    spectrum_box.import_files()
+
+main_window.bind("<Control-o>", import_spectra)     # Bind to the Ctrl+O shortcut
+
+
 # --- Update the window when new files are successfully loaded ---#
 
 def update_spectrum_window(event):
@@ -158,14 +166,15 @@ main_window.bind("<<FilesImported>>", update_spectrum_window)
 
 #--- Saving the CIE diagram ---#
 
-def save_diagram():
+def save_diagram(*event):
     toolbar.save_figure()
 
 def disable_exit_confirmation(*event):
     global confirm_exit
     confirm_exit = False
 
-main_window.bind("<<FigureSaved>>", disable_exit_confirmation)
+main_window.bind("<<FigureSaved>>", disable_exit_confirmation)  # Turn off exit confirmation when the diagram is saved
+main_window.bind("<Control-s>", save_diagram)                   # Bind diagram saving to the Ctrl+S shortcut
 
 
 # --- Updating the color information frame
@@ -398,7 +407,7 @@ def select_all(*event):
     all_items = tree_spectrum.get_children()
     tree_spectrum.selection_set(all_items)
 
-# Bind the function to the Ctrl+A key combo
+# Bind the function to the Ctrl+A shortcut
 main_window.bind("<Control-a>", select_all)
 
 
