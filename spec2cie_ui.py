@@ -1,12 +1,11 @@
 import tkinter as tk
 import tkinter.ttk as ttk
-from tkinter.messagebox import askyesno
+from tkinter.messagebox import (askyesno, showerror)
 from tkinter.filedialog import asksaveasfilename
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
 import matplotlib as mpl
+import xlsxwriter as excel
 import os, sys
-
-from matplotlib.pyplot import title
 from spec2cie import (spectrum_container, plot_container)
 
 #-----------------------------------------------------------------------------
@@ -179,6 +178,20 @@ def disable_exit_confirmation(*event):
 main_window.bind("<<FigureSaved>>", disable_exit_confirmation)  # Turn off exit confirmation when the diagram is saved
 main_window.bind("<Control-s>", save_diagram)                   # Bind diagram saving to the Ctrl+S shortcut
 
+#--- Convert RGB color to hexadecimal (HTML representation)---#
+
+def rgb_to_hex(color_RGB):
+    """Takes a sequence of 3 elements (each one a integer from 0 to 255), representing a RGB color.
+    Returns the HTML representation of the color (hexadecimal): #RRGGBB
+    """
+
+    color_hex = hex((color_RGB[0] << 16) | (color_RGB[1] << 8) | (color_RGB[2]))    # Convert the color values to hexadecimal
+    color_hex = color_hex.replace("0x", "", 1)  # Remove the "0x" from the beginning
+    color_hex = color_hex.rjust(6, "0")         # Ensure that the string is 6 characters long (fill with leading "0", if needed)
+    color_hex = "#" + color_hex                 # Add a "#" to the beginning
+
+    return color_hex
+
 
 #--- Exporting the coordinates to a text file ---#
 
@@ -188,24 +201,91 @@ def export_coordinates(*event):
         parent =  main_window,
         title = "Exporting CIE color coordinates",
         defaultextension = "",
-        filetypes = (("Text file (*.txt)", "*.txt"), ("All files", "*.*")),
+        filetypes = (("Microsoft Excel spreadsheet (*.xlsx)", "*.xlsx"), ("Text file (*.txt)", "*.txt")),
     )
     
     if save_path == "":
         return False
 
-    with open(save_path, "w") as file:
-
-        file.write(f"{'Spectrum':<20}\tCIE x\tCIE y\tCIE z\tRGB color\n")
+    if save_path.endswith(".xlsx"):     # File is being saved as Microsoft Excel spreadsheet
         
-        for spectrum in spectrum_CIE_dict.values():
-            
+        workbook = excel.Workbook(save_path)            # Create the workbook (a colection of spreadsheets)
+        worksheet = workbook.add_worksheet("CIE 1931")  # Create a spreadsheet on the workbook
+
+        # Format the first row to bold
+        bold = workbook.add_format({'bold': True})
+        worksheet.set_row(0, None, bold)
+
+        # Write the title headers on the first row
+        worksheet.write(0, 0, "Spectrum")   # Column A
+        worksheet.write(0, 1, "CIE x")      # Column B
+        worksheet.write(0, 2, "CIE y")      # Column C
+        worksheet.write(0, 3, "CIE z")      # Column D
+        worksheet.write(0, 4, "RGB color")  # Column E
+
+        # Loop through all spectra and write their color coordinates to the spreadsheet
+        for row, spectrum in enumerate(spectrum_CIE_dict.values(), 1):
+
+            # Get the RGB color and use it as the background of its own cell
             color_RGB = tuple(int(255 * color) for color in spectrum.RGB)
-            line = f"{spectrum.file_name:<20}\t{spectrum.x:.3f}\t{spectrum.y:.3f}\t{1.0 - spectrum.x - spectrum.y:.3f}\t{color_RGB}\n"
-            file.write(line)
+            color_hex = rgb_to_hex(color_RGB)
+            background = workbook.add_format({"bg_color" : color_hex})
+
+            # Write each cell of the row
+            worksheet.write(row, 0, spectrum.file_name)             # Spectrum
+            worksheet.write(row, 1, spectrum.x)                     # CIE x
+            worksheet.write(row, 2, spectrum.y)                     # CIE y
+            worksheet.write(row, 3, 1.0 - spectrum.x - spectrum.y)  # CIE z
+            worksheet.write(row, 4, str(color_RGB), background)     # RGB color
+
+        # Enlarge the columns A (Spectrum) and E (RBG color), so their contents are better displayed
+        worksheet.set_column(0, 0, 30)          # 30 numeric characters wide
+        worksheet.set_column_pixels(4, 4, 95)   # 95 pixels wide
+        """NOTE
+        It is not possible to do an "auto fit" column through code, only when viewing the file on Excel.
+        The correlation between the width of the column and the number of characters is now trivial,
+        it depends on the screen resolution and the default font (which can have variable character width).
+        More info: https://docs.microsoft.com/en-US/office/troubleshoot/excel/determine-column-widths
+                   https://xlsxwriter.readthedocs.io/worksheet.html#set_column
+        
+        That width is based on numeric characters, however the file names usually use mostly letters.
+        It is perhaps not possibly the reliably calculate the maximum width of the text in Column A.
+        So I instead just set it to a reasonable value so most of the text can be shown.
+        """
+
+        try:
+            workbook.close()    # Finish writing to the workbook and save the file
+        except excel.exceptions.FileCreateError:
+            # Display a error if the file was already in use
+            showerror(
+                master = main_window,
+                title = "Save error",
+                message = f"Could not save to {save_path}\nThe file is already in use by another program."
+            )
+            del worksheet
+            del workbook
     
-    global confirm_exit
-    confirm_exit = False
+    else:   # File is being saved as plain text
+
+        try:
+            with open(save_path, "w") as file:
+
+                # Write the header titles
+                file.write(f"{'Spectrum':<20}\tCIE x\tCIE y\tCIE z\tRGB color\n")
+                
+                # Loop through each spectrum and write its color coordinates to a new line
+                for spectrum in spectrum_CIE_dict.values():
+                    color_RGB = tuple(int(255 * color) for color in spectrum.RGB)
+                    line = f"{spectrum.file_name:<20}\t{spectrum.x:.3f}\t{spectrum.y:.3f}\t{1.0 - spectrum.x - spectrum.y:.3f}\t{color_RGB}\n"
+                    file.write(line)
+        
+        except PermissionError:
+            # Display a error if the file was already in use
+            showerror(
+                master = main_window,
+                title = "Save error",
+                message = f"Could not save to {save_path}\nThe file is already in use by another program."
+            )
 
 main_window.bind("<Control-e>", export_coordinates)
 
@@ -247,12 +327,8 @@ def update_color_info(event):
 
     # Get the RGB color from the spectrum and display the color
     color_RGB = [int(255 * color) for color in spectrum.RGB]    # Integer list [Red, Green, Blue] on the 0..255 range
-
-    color_hex = hex((color_RGB[0] << 16) | (color_RGB[1] << 8) | (color_RGB[2]))    # Convert the color values to hexadecimal
-    color_hex = color_hex.replace("0x", "", 1)  # Remove the "0x" from the beginning
-    color_hex = color_hex.rjust(6, "0")         # Ensure that the string is 6 characters long (fill with leading "0", if needed)
-    color_hex = "#" + color_hex                 # Add a "#" to the beginning
-    cell_color_display["bg"] = color_hex        # Display the color
+    color_hex = rgb_to_hex(color_RGB)                           # Convert the color to the hexadecimal format: #RRGGBB
+    cell_color_display["bg"] = color_hex                        # Display the color
 
     # Update the Spectral Distribution
     previous_sd = current_sd            # Store the previous Spectral Distribution
