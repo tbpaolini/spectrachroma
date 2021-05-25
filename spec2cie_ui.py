@@ -1,9 +1,12 @@
 import tkinter as tk
 import tkinter.ttk as ttk
 from tkinter.messagebox import askyesno
+from tkinter.filedialog import asksaveasfilename
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
 import matplotlib as mpl
 import os, sys
+
+from matplotlib.pyplot import title
 from spec2cie import (spectrum_container, plot_container)
 
 #-----------------------------------------------------------------------------
@@ -176,6 +179,35 @@ def disable_exit_confirmation(*event):
 main_window.bind("<<FigureSaved>>", disable_exit_confirmation)  # Turn off exit confirmation when the diagram is saved
 main_window.bind("<Control-s>", save_diagram)                   # Bind diagram saving to the Ctrl+S shortcut
 
+
+#--- Exporting the coordinates to a text file ---#
+
+def export_coordinates(*event):
+    
+    save_path = asksaveasfilename(
+        parent =  main_window,
+        title = "Exporting CIE color coordinates",
+        defaultextension = "",
+        filetypes = (("Text file (*.txt)", "*.txt"), ("All files", "*.*")),
+    )
+    
+    if save_path == "":
+        return False
+
+    with open(save_path, "w") as file:
+
+        file.write(f"{'Spectrum':<20}\tCIE x\tCIE y\tCIE z\tRGB color\n")
+        
+        for spectrum in spectrum_CIE_dict.values():
+            
+            color_RGB = tuple(int(255 * color) for color in spectrum.RGB)
+            line = f"{spectrum.file_name:<20}\t{spectrum.x:.3f}\t{spectrum.y:.3f}\t{1.0 - spectrum.x - spectrum.y:.3f}\t{color_RGB}\n"
+            file.write(line)
+    
+    global confirm_exit
+    confirm_exit = False
+
+main_window.bind("<Control-e>", export_coordinates)
 
 # --- Updating the color information frame
 def update_color_info(event):
@@ -485,7 +517,7 @@ menu_file.add_command(
 menu_file.add_command(
     label = "Export all coordinates...",
     accelerator = "Ctrl+E",
-    # command = ,
+    command = export_coordinates,
 )
 
 menu_file.add_separator()
