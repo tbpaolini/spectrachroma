@@ -144,7 +144,7 @@ def update_spectrum_window(event):
         if first_loop:
             first_item = CIE_point
             first_loop = False
-
+        
     # Change the selection to the first imported item, if no more than 1 item is already selected
     if len(tree_spectrum.selection()) <= 1:
         tree_spectrum.selection_set(first_item)
@@ -161,6 +161,13 @@ def update_spectrum_window(event):
 
     # Turn on exit confirmation
     confirm_exit = True
+
+    # Enable menu options
+    menu_file.entryconfigure(4, state=tk.NORMAL)    # File > Save spectrum
+    menu_file.entryconfigure(5, state=tk.NORMAL)    # File > Export coordinates
+    menu_edit.entryconfigure(4, state=tk.NORMAL)    # Edit > Select all spectra
+    menu_edit.entryconfigure(5, state=tk.NORMAL)    # Edit > Delete selected spectra
+    menu_edit.entryconfigure(6, state=tk.NORMAL)    # Edit > Delete all spectra
 
 # Bind the update function to the "Files Imported" event
 main_window.bind("<<FilesImported>>", update_spectrum_window)
@@ -445,12 +452,25 @@ def delete_selected(*event):
         plot.flush_cie()                                    # Clear the diagram's points
         if spectrum_count > 0:
             plot.plot_cie(spectrum_CIEx, spectrum_CIEy)     # Plot the points of the remaining spectra
+            confirm_exit = True                             # Turn on exit confirmation because the diagram has changed
         else:
-            confirm_exit = False                            # Turn off exit confirmation if there are no remaining spectra
+            confirm_exit = False                            # Turn off exit confirmation because there are no remaining spectra
+            menu_file.entryconfigure(4, state=tk.DISABLED)  # Disable menu option: File > Save spectrum
+            menu_file.entryconfigure(5, state=tk.DISABLED)  # Disable menu option: File > Export coordinates
+            menu_edit.entryconfigure(4, state=tk.DISABLED)  # Disable menu option: Edit > Select all spectra
+            menu_edit.entryconfigure(5, state=tk.DISABLED)  # Disable menu option: Edit > Remove selected spectra
+            menu_edit.entryconfigure(6, state=tk.DISABLED)  # Disable menu option: Edit > Remove all spectra
+        
         canvas_CIE.draw()                                   # Update the diagram's canvas
 
         # Delete the selected items from the Treeview
         tree_spectrum.delete(*selected_items)
+
+        # Change the selection to the first item on the Treeview
+        if spectrum_count > 0:
+            first_item = tree_spectrum.get_children()[0]
+            tree_spectrum.selection_set(first_item)
+            tree_spectrum.focus(first_item)
     
     # Delete without confirmation if Shift is being held
     if shift_key:
@@ -534,7 +554,7 @@ def clean_exit(*event):
         confirmation = askyesno(
             master = main_window,
             title = "Confirm exit",
-            message = "Unsaved data will be lost. Continue?",
+            message = "Unsaved diagram will be lost. Continue?",
             default = "no",
         )
         if confirmation:
@@ -591,9 +611,16 @@ menu_file.add_command(
 )
 
 menu_file.add_command(
+    label = "Save spectrum...",
+    # command = ,
+    state = tk.DISABLED,    # Will be enabled when a spectrum is imported
+)
+
+menu_file.add_command(
     label = "Export all coordinates...",
     accelerator = "Ctrl+E",
     command = export_coordinates,
+    state = tk.DISABLED,    # Will be enabled when a spectrum is imported
 )
 
 menu_file.add_separator()
@@ -638,15 +665,18 @@ menu_edit.add_command(
     label = "Select all spectra",
     accelerator = "Ctrl+A",
     command = select_all,
+    state = tk.DISABLED,    # Will be enabled when a spectrum is imported
 )
 menu_edit.add_command(
     label = "Remove selected spectra",
     accelerator = "Del",
     command = delete_selected,
+    state = tk.DISABLED,    # Will be enabled when a spectrum is imported
 )
 menu_edit.add_command(
     label = "Remove all spectra",
     command = delete_all,
+    state = tk.DISABLED,    # Will be enabled when a spectrum is imported
 )
 
 # Add Help commands
