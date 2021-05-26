@@ -164,7 +164,7 @@ def update_spectrum_window(event):
     confirm_exit = True
 
     # Enable menu options
-    menu_file.entryconfigure(4, state=tk.NORMAL)    # File > Save spectrum
+    menu_file.entryconfigure(4, state=tk.NORMAL)    # File > Save spectral distribution
     menu_file.entryconfigure(5, state=tk.NORMAL)    # File > Export coordinates
     menu_edit.entryconfigure(4, state=tk.NORMAL)    # Edit > Select all spectra
     menu_edit.entryconfigure(5, state=tk.NORMAL)    # Edit > Delete selected spectra
@@ -299,6 +299,16 @@ def export_coordinates(*event):
             )
 
 main_window.bind("<Control-e>", export_coordinates)
+
+
+#--- Exporting the Spectral Distribution ---#
+
+def save_sd(*event):
+    if current_sd:
+        plot.save_sd(current_sd)
+
+# Bind the function to the Ctrl+D shortcut
+main_window.bind("<Control-d>", save_sd)
 
 # --- Updating the color information frame
 def update_color_info(event):
@@ -560,7 +570,7 @@ def delete_selected(*event):
             confirm_exit = True                             # Turn on exit confirmation because the diagram has changed
         else:
             confirm_exit = False                            # Turn off exit confirmation because there are no remaining spectra
-            menu_file.entryconfigure(4, state=tk.DISABLED)  # Disable menu option: File > Save spectrum
+            menu_file.entryconfigure(4, state=tk.DISABLED)  # Disable menu option: File > Save spectral distribution
             menu_file.entryconfigure(5, state=tk.DISABLED)  # Disable menu option: File > Export coordinates
             menu_edit.entryconfigure(4, state=tk.DISABLED)  # Disable menu option: Edit > Select all spectra
             menu_edit.entryconfigure(5, state=tk.DISABLED)  # Disable menu option: Edit > Remove selected spectra
@@ -712,21 +722,22 @@ menu_file.add_command(
 menu_file.add_separator()
 
 menu_file.add_command(
-    label = "Save diagram...",
+    label = "Save chromaticity diagram...",
     accelerator = "Ctrl+S",
     underline = 5,  # Underline D during keyboard traversal
     command = save_diagram,
 )
 
 menu_file.add_command(
-    label = "Save spectrum...",
+    label = "Save spectral distribution...",
     underline = 5,          # Underline S during keyboard traversal
-    # command = ,
+    accelerator = "Ctrl+D",
+    command = save_sd,
     state = tk.DISABLED,    # Will be enabled when a spectrum is imported
 )
 
 menu_file.add_command(
-    label = "Export all coordinates...",
+    label = "Export all color coordinates...",
     accelerator = "Ctrl+E",
     underline = 0,          # Underline E during keyboard traversal
     command = export_coordinates,

@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 from colour.plotting import *
 from tkinter.filedialog import askopenfilenames
 from pathlib import Path
+from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
 
 #-----------------------------------------------------------------------------
 # Calculation of color coordinates from spectrum file
@@ -538,6 +539,52 @@ class plot_container():
         
         # Remove the blank spaces around the figure
         self.fig_sd.subplots_adjust(left=0, bottom=0, right=1, top=1, wspace=0, hspace=0)
+    
+    def save_sd(self, spectral_distribution):
+        """Export the Spectral Distribution to an image file.
+        """
+        # Find the spectrum handler on the container
+        my_sd = False
+        for spectrum,axis_sd in self.ax_sd.items():
+            if axis_sd == spectral_distribution:
+                my_sd = spectrum
+                break
+        
+        # If no spectrum is found, exit the function
+        if not my_sd:
+            return False
+
+        # Plot the spectral distribution from the raw spectrum data
+        figure, axis = plot_single_sd(
+            my_sd.spectrum_raw,              # Dictionary with the spectrum values
+            axes_visible = True,
+            title = "Spectral Distribution (CIE 1931)",
+            standalone = False,
+            transparent_background = False,
+        )
+        axis.get_yaxis().set_ticks([])                  # Remove tick labels from the y-axis
+        axis.set_xlabel("Wavelength (nm)")              # Title of the x-axis
+        axis.set_ylabel("Intensity (arbitrary units)")  # Title of the y-axis
+        axis.set_xlim((380, 780))                       # x-axis range (380 to 780 nm)
+        figure.subplots_adjust(left=0.05, bottom=0.11, right=0.95, top=0.93, wspace=0, hspace=0)    # Margins of the graph
+
+        # Create a canvas for the plot
+        canvas = FigureCanvasTkAgg(figure)
+
+        # Create a toolbar for the plot
+        toolbar = NavigationToolbar2Tk(canvas, None, pack_toolbar = False)
+        toolbar.save_figure()
+        """NOTE
+        I am creating a toolbar because it already has a built-in method to
+        save the figure, with several different file formats.
+        This saves the time I would need to create those routines from scratch.
+        """
+
+        # Garbage collection of the plot
+        toolbar.destroy()
+        canvas.get_tk_widget().destroy()
+        axis.remove()
+        plt.close(figure)
     
     def __del__(self):
         """Ensure that the plots get closed when the object is deleted.
