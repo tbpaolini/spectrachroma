@@ -17,6 +17,7 @@ main_window = tk.Tk()
 main_window.title("SpectraChroma")
 #main_window.geometry("1024x700")
 main_window.minsize(840, 590)
+main_window.iconbitmap("icon.ico")
 
 
 # Left column - Color and spectrum tables
