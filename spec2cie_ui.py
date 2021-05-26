@@ -203,6 +203,9 @@ def rgb_to_hex(color_RGB):
 #--- Exporting the coordinates to a text file ---#
 
 def export_coordinates(*event):
+
+    if menu_file.entrycget(5, "state") == tk.DISABLED:
+        return False    # Exit the funtion when there is no data to be exported
     
     save_path = asksaveasfilename(
         parent =  main_window,
