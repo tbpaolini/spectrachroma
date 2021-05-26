@@ -4,6 +4,7 @@ from tkinter.messagebox import (askyesno, showerror)
 from tkinter.filedialog import asksaveasfilename
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
 import matplotlib as mpl
+from numpy import short
 import xlsxwriter as excel
 import os, sys
 from spec2cie import (spectrum_container, plot_container)
@@ -372,6 +373,45 @@ def reset_color_info(*event):
     previous_sd = None
 
 
+#--- Toggle grid lines on the Chromaticity Diagram ---#
+
+def toggle_gridlines(*event):
+    """Switch on/off the gridlines on the Chromaticity Diagram
+    """
+    
+    if len(event) > 0:
+        shortcut = True
+    else:
+        shortcut = False
+    """NOTE
+    If the "event" argument was sent to the function, then that means that
+    the function was activated by its shortcut key rather than chosen on
+    the menu.
+    So len(event) will always be 0 when the function is activated by the
+    menu, and will be 1 when activated by the shortcut.
+    This is important because the option flag is switched automatically
+    when actiavted through the menu, but in the case of a shortcut being used
+    I need to switch through my code.
+    """
+    
+    # Toggle the variable if the shortcut key was used
+    if shortcut:
+        old_value = show_gridlines.get()
+        show_gridlines.set(not old_value)
+    
+    # Display or remove the grid lines
+    if show_gridlines.get():    # Grid lines are enabled
+        plot.ax_CIE.grid(alpha = 0.3)
+        canvas_CIE.draw()
+    
+    else:                       # Grid lines are disabled
+        plot.ax_CIE.grid(False)
+        canvas_CIE.draw()
+
+# Bind the function to the F2 shortcut
+main_window.bind("<F2>", toggle_gridlines)
+
+
 #--- Deleting points from the diagram ---#
 
 def delete_selected(*event):
@@ -648,7 +688,7 @@ menu_edit.add_checkbutton(
     offvalue = False,
     accelerator = "F2",
     underline = 5,          # Underline G during keyboard traversal
-    #command = ,
+    command = toggle_gridlines,
 )
 
 menu_edit.add_checkbutton(
