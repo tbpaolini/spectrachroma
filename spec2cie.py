@@ -303,7 +303,7 @@ class plot_container():
         self.ax_CIE.set_facecolor("black")
 
         # Formatting the diagram's title (white bold text, with a bigger size)
-        self.ax_CIE.set_title(
+        self.title_CIE = self.ax_CIE.set_title(
             self.ax_CIE.get_title(),
             color = "white",
             fontweight = "bold",

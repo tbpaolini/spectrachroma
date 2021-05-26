@@ -412,6 +412,38 @@ def toggle_gridlines(*event):
 main_window.bind("<F2>", toggle_gridlines)
 
 
+#--- Toggle grid lines on the Chromaticity Diagram ---#
+
+def toggle_axis(*event):
+    """Switch on/off the axes on the Chromaticity Diagram
+    """
+    
+    # Verify if the shortcut key was used
+    if len(event) > 0:
+        shortcut = True
+    else:
+        shortcut = False
+    
+    # Toggle the variable if the shortcut key was used
+    if shortcut:
+        old_value = show_axis.get()
+        show_axis.set(not old_value)
+    
+    # Display or remove the grid lines
+    if show_axis.get():                     # Axes are enabled
+        plot.ax_CIE.axis("on")              # Display axes
+        plot.title_CIE.set_visible(True)    # Display title
+        canvas_CIE.draw()
+    
+    else:                                   # Axes are disabled
+        plot.ax_CIE.axis("off")             # Hide axes
+        plot.title_CIE.set_visible(False)   # Hide title
+        canvas_CIE.draw()
+
+# Bind the function to the F3 shortcut
+main_window.bind("<F3>", toggle_axis)
+
+
 #--- Deleting points from the diagram ---#
 
 def delete_selected(*event):
@@ -698,7 +730,7 @@ menu_edit.add_checkbutton(
     offvalue = False,
     accelerator = "F3",
     underline = 5,          # Underline A during keyboard traversal
-    #command = ,
+    command = toggle_axis,
 )
 
 menu_edit.add_checkbutton(
