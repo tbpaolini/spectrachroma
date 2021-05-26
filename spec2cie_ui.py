@@ -586,19 +586,21 @@ main_window["menu"] = menubar
 menu_file = tk.Menu(menubar)
 menu_edit = tk.Menu(menubar)
 menu_help = tk.Menu(menubar)
-menubar.add_cascade(menu=menu_file, label="File")
-menubar.add_cascade(menu=menu_edit, label="Edit")
-menubar.add_cascade(menu=menu_help, label="Help")
+menubar.add_cascade(menu=menu_file, label="File", underline=0)
+menubar.add_cascade(menu=menu_edit, label="Edit", underline=0)
+menubar.add_cascade(menu=menu_help, label="Help", underline=0)
 
 # Add File commands
 menu_file.add_command(
     label = "Import spectra...",
     command = spectrum_box.import_files,
     accelerator = "Ctrl+O",
+    underline = 0,  # Underline I during keyboard traversal
 )
 menu_file.add_command(
     label = "New diagram",
     accelerator = "Ctrl+N",
+    underline = 0,  # Underline N during keyboard traversal
     # command = ,
 )
 
@@ -607,11 +609,13 @@ menu_file.add_separator()
 menu_file.add_command(
     label = "Save diagram...",
     accelerator = "Ctrl+S",
+    underline = 5,  # Underline D during keyboard traversal
     command = save_diagram,
 )
 
 menu_file.add_command(
     label = "Save spectrum...",
+    underline = 5,          # Underline S during keyboard traversal
     # command = ,
     state = tk.DISABLED,    # Will be enabled when a spectrum is imported
 )
@@ -619,6 +623,7 @@ menu_file.add_command(
 menu_file.add_command(
     label = "Export all coordinates...",
     accelerator = "Ctrl+E",
+    underline = 0,          # Underline E during keyboard traversal
     command = export_coordinates,
     state = tk.DISABLED,    # Will be enabled when a spectrum is imported
 )
@@ -628,6 +633,7 @@ menu_file.add_separator()
 menu_file.add_command(
     label = "Close",
     accelerator = "Alt+F4",
+    underline = 0,          # Underline C during keyboard traversal
     command = clean_exit,
 )
 
@@ -638,6 +644,7 @@ menu_edit.add_checkbutton(
     onvalue = True,
     offvalue = False,
     accelerator = "F2",
+    underline = 5,          # Underline G during keyboard traversal
     #command = ,
 )
 
@@ -647,6 +654,7 @@ menu_edit.add_checkbutton(
     onvalue = True,
     offvalue = False,
     accelerator = "F3",
+    underline = 5,          # Underline A during keyboard traversal
     #command = ,
 )
 
@@ -656,6 +664,7 @@ menu_edit.add_checkbutton(
     onvalue = True,
     offvalue = False,
     accelerator = "F4",
+    underline = 5,          # Underline L during keyboard traversal
     #command = ,
 )
 
@@ -683,6 +692,7 @@ menu_edit.add_command(
 menu_help.add_command(
     label = "Help",
     accelerator = "F1",
+    underline = 0,
     # command = ,
 )
 
@@ -690,6 +700,7 @@ menu_help.add_separator()
 
 menu_help.add_command(
     label = "About",
+    underline = 0,
     # command = ,
 )
 
