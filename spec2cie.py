@@ -410,6 +410,7 @@ class plot_container():
         This list will hold those labels handlers, so batch operations can be applied to them.
         """
         self.label_CIE = []
+        self.label_CIE_visible = True  # Whether the data labels are being shown on the diagram
 
         # List for the plotted coordinates
         """NOTE
@@ -469,6 +470,8 @@ class plot_container():
                 )
             )
 
+            my_label.set_visible(self.label_CIE_visible)    # Show or hide the label, based on the current setting
+
             #print(f"Point: {(CIEx[point_index], CIEy[point_index])} (index: {point_index})")
             point_index += 1
 
@@ -494,6 +497,14 @@ class plot_container():
         # Reset the points counter
         self.points_count = 0
     
+    def show_labels_cie(self, display_labels):
+        """ Show (True) or hide (False) the data labels on the Chromaticity Diagram.
+        """
+        self.label_CIE_visible = display_labels     # Change the current setting flag
+
+        for label in self.label_CIE:                # Change the setting on each label
+            label.set_visible(display_labels)
+
     def plot_sd(self, spectrum_list):
         """Plot a Spectral Distribution for each spectrum in a list.
         """

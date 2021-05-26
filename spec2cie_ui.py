@@ -444,6 +444,36 @@ def toggle_axis(*event):
 main_window.bind("<F3>", toggle_axis)
 
 
+#--- Toggle grid lines on the Chromaticity Diagram ---#
+
+def toggle_labels(*event):
+    """Switch on/off the data labels on the Chromaticity Diagram
+    """
+    
+    # Verify if the shortcut key was used
+    if len(event) > 0:
+        shortcut = True
+    else:
+        shortcut = False
+    
+    # Toggle the variable if the shortcut key was used
+    if shortcut:
+        old_value = show_labels.get()
+        show_labels.set(not old_value)
+    
+    # Display or remove the grid lines
+    if show_labels.get():                     # Axes are enabled
+        plot.show_labels_cie(True)              # Display axes
+        canvas_CIE.draw()
+    
+    else:                                   # Axes are disabled
+        plot.show_labels_cie(False)             # Hide axes
+        canvas_CIE.draw()
+
+# Bind the function to the F4 shortcut
+main_window.bind("<F4>", toggle_labels)
+
+
 #--- Deleting points from the diagram ---#
 
 def delete_selected(*event):
@@ -740,7 +770,7 @@ menu_edit.add_checkbutton(
     offvalue = False,
     accelerator = "F4",
     underline = 5,          # Underline L during keyboard traversal
-    #command = ,
+    command = toggle_labels,
 )
 
 menu_edit.add_separator()
