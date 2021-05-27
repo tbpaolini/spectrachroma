@@ -388,7 +388,7 @@ def reset_color_info(*event):
 
 #--- Toggle grid lines on the Chromaticity Diagram ---#
 
-def toggle_gridlines(*event):
+def toggle_gridlines(*event, reset=False):
     """Switch on/off the gridlines on the Chromaticity Diagram
     """
     
@@ -411,6 +411,8 @@ def toggle_gridlines(*event):
     if shortcut:
         old_value = show_gridlines.get()
         show_gridlines.set(not old_value)
+    elif reset:
+        show_gridlines.set(False)
     
     # Display or remove the grid lines
     if show_gridlines.get():    # Grid lines are enabled
@@ -427,7 +429,7 @@ main_window.bind("<F2>", toggle_gridlines)
 
 #--- Toggle grid lines on the Chromaticity Diagram ---#
 
-def toggle_axis(*event):
+def toggle_axis(*event, reset=False):
     """Switch on/off the axes on the Chromaticity Diagram
     """
     
@@ -441,6 +443,8 @@ def toggle_axis(*event):
     if shortcut:
         old_value = show_axis.get()
         show_axis.set(not old_value)
+    elif reset:
+        show_axis.set(True)
     
     # Display or remove the grid lines
     if show_axis.get():                     # Axes are enabled
@@ -459,7 +463,7 @@ main_window.bind("<F3>", toggle_axis)
 
 #--- Toggle grid lines on the Chromaticity Diagram ---#
 
-def toggle_labels(*event):
+def toggle_labels(*event, reset=False):
     """Switch on/off the data labels on the Chromaticity Diagram
     """
     
@@ -473,6 +477,8 @@ def toggle_labels(*event):
     if shortcut:
         old_value = show_labels.get()
         show_labels.set(not old_value)
+    elif reset:
+        show_labels.set(True)
     
     # Display or remove the grid lines
     if show_labels.get():                     # Axes are enabled
@@ -489,7 +495,7 @@ main_window.bind("<F4>", toggle_labels)
 
 #--- Deleting points from the diagram ---#
 
-def delete_selected(*event):
+def delete_selected(*event, do_confirmation=True):
     """Remove from the diagram the points selected on the Treeview
     """
     
@@ -604,12 +610,15 @@ def delete_selected(*event):
             confirmation_message = f"{selected_amount} items will be removed from the list and diagram. Continue?"
         
         # Display the confirmation dialog
-        confirmation = askyesno(
-            master = main_window,
-            title = "Confirm removal",
-            message = confirmation_message,
-            default = "no",
-        )
+        if do_confirmation:
+            confirmation = askyesno(
+                master = main_window,
+                title = "Confirm removal",
+                message = confirmation_message,
+                default = "no",
+            )
+        else:
+            confirmation = True
 
         if confirmation:
             # Delete items if the user chose "yes"
@@ -663,6 +672,23 @@ def delete_all():
     select_all()
     delete_selected()
 
+
+#--- New diagram ---#
+
+def new_diagram(*event):
+    # Delete all items (no confirmation, if the user has already saved the diagram)
+    select_all()
+    delete_selected(do_confirmation=confirm_exit)
+
+    # Reset the diagram options
+    toggle_gridlines(reset=True)
+    toggle_axis(reset=True)
+    toggle_labels(reset=True)
+
+    # Reset to the original view
+    toolbar.home()
+
+main_window.bind("<Control-n>", new_diagram)
 
 #--- Exiting the program ---#
 
@@ -719,7 +745,7 @@ menu_file.add_command(
     label = "New diagram",
     accelerator = "Ctrl+N",
     underline = 0,  # Underline N during keyboard traversal
-    # command = ,
+    command = new_diagram,
 )
 
 menu_file.add_separator()
