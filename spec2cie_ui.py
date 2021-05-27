@@ -379,7 +379,8 @@ def reset_color_info(*event):
     cell_z_value_text.set("")
     cell_color_display["bg"] = "#f0f0f0"
 
-    current_sd.set_visible(False)
+    if current_sd:
+        current_sd.set_visible(False)
     canvas_sd.draw()
     current_sd = None
     previous_sd = None

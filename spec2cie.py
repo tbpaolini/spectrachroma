@@ -584,12 +584,15 @@ class plot_container():
         toolbar.destroy()
         canvas.get_tk_widget().destroy()
         axis.remove()
+        figure.clf()
         plt.close(figure)
     
     def __del__(self):
         """Ensure that the plots get closed when the object is deleted.
         """
         # Close all figures
+        self.fig_CIE.clf()
+        self.fig_sd.clf()
         plt.close("all")
 
 
