@@ -1,4 +1,4 @@
-import colour, re
+import colour, re, gc
 import matplotlib.pyplot as plt
 from colour.plotting import *
 from tkinter.filedialog import askopenfilenames
@@ -581,11 +581,16 @@ class plot_container():
         """
 
         # Garbage collection of the plot
-        toolbar.destroy()
-        canvas.get_tk_widget().destroy()
-        axis.remove()
-        figure.clf()
-        plt.close(figure)
+        figure.clf()                        # Clear figure
+        axis.cla()                          # Clear axis
+        toolbar.destroy()                   # Delete toolbar
+        canvas.get_tk_widget().destroy()    # Delete canvas
+        plt.close(figure)                   # Close plot
+        del figure
+        del axis
+        
+        # Run the garbage collector to free up memory immediately
+        gc.collect()
     
     def __del__(self):
         """Ensure that the plots get closed when the object is deleted.

@@ -6,7 +6,7 @@ from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationTool
 import matplotlib as mpl
 from numpy import short
 import xlsxwriter as excel
-import os, sys
+import os, sys, gc
 from spec2cie import (spectrum_container, plot_container)
 
 #-----------------------------------------------------------------------------
@@ -537,6 +537,7 @@ def delete_selected(*event, do_confirmation=True):
             spectrum_box.id.remove(spectrum)
             
             # Remove the spectral distribution from its container
+            plot.ax_sd[spectrum].cla()      # Clear axis
             plot.ax_sd[spectrum].remove()   # Delete axis
             del plot.ax_sd[spectrum]        # Delete its entry on the axis dictionary
             
@@ -595,6 +596,9 @@ def delete_selected(*event, do_confirmation=True):
             first_item = tree_spectrum.get_children()[0]
             tree_spectrum.selection_set(first_item)
             tree_spectrum.focus(first_item)
+        
+        # Run the garbage collector to free the memory that was being used by the removed spectra
+        gc.collect()
     
     # Delete without confirmation if Shift is being held
     if shift_key:
