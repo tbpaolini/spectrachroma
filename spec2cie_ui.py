@@ -839,7 +839,7 @@ class new_window():
     def about(self, *event):
         """Create a About window from the contents of the "About.txt" file.
         """
-        self.__create_window("lib\Help.txt", "About")
+        self.__create_window("lib\About.txt", "About")
 
 # Instantiate the class
 info_window = new_window(main_window)
