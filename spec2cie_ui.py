@@ -731,11 +731,22 @@ class new_window():
     """
     def __init__(self, parent_window):
         self.parent_window = parent_window  # Associate the new window to the main window
-        self.open_windows = {}              # Store the open windows so any duplicates can be closed
+        self.open_windows = {}              # Store the open windows so duplicates can be avoided
     
     def __create_window(self, text_file, window_title):
         """Create a new window with the the contents of a text file.
         """
+        # Check for a duplicate window
+        if self.open_windows.get(window_title, None):
+            
+            # Bring the existing window to the front
+            self.open_windows[window_title].state("normal")
+
+            # Change focus to the existing window
+            self.open_windows[window_title].focus_force()
+
+            # Exit the function, instead of creating a new window
+            return False
         
         # Create the window
         my_window = tk.Toplevel(
@@ -753,6 +764,10 @@ class new_window():
             padx = 5,
             pady = 5,
         )
+
+        # Remove window from the dictionary when it is closed
+        # (when the windo closes, it trigers the "Destroy" event of the text box)
+        my_textbox.bind("<Destroy>", lambda event: self.open_windows.update({window_title: None}))
         
         # Regular expression to match the titles
         # (digits followed by closing paranthesis and text)
@@ -811,10 +826,6 @@ class new_window():
                 expand = True,      # Text box can be resized
                 fill = tk.BOTH,     # Text box expands to fill all the available space
             )
-
-            # Close duplicate window
-            if self.open_windows.get(window_title, None):
-                self.open_windows[window_title].destroy()
             
             # Store the opened window on the dictionary
             self.open_windows.update({window_title: my_window})
