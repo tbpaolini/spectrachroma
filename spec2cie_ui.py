@@ -699,6 +699,7 @@ main_window.bind("<Control-n>", new_diagram)
 
 # As the user if they want to close the program, when there are still stuff to save
 def clean_exit(*event):
+    global main_window
     if confirm_exit:
         confirmation = askyesno(
             master = main_window,
@@ -707,8 +708,10 @@ def clean_exit(*event):
             default = "no",
         )
         if confirmation:
+            main_window.destroy()
             sys.exit()
     else:
+        main_window.destroy()
         sys.exit()
 
 # Exit the program properly when closing the window or pressing Alt+F4
