@@ -733,8 +733,8 @@ class new_window():
         self.parent_window = parent_window  # Associate the new window to the main window
         self.open_windows = {}              # Store the open windows so any duplicates can be closed
     
-    def __create_window(self, text, window_title):
-        """Create a new window with the specified text content and title.
+    def __create_window(self, text_file, window_title):
+        """Create a new window with the the contents of a text file.
         """
         
         # Create the window
@@ -756,83 +756,78 @@ class new_window():
         
         # Regular expression to match the titles
         # (digits followed by closing paranthesis and text)
-        text_regex = re.compile(r"(?m)(^\d+\).*$)")
+        text_regex = re.compile(r"(?m)^\d+\).*$")
         
-        # Divide text into lines
-        text_lines = text.splitlines(True)
-
-        # Create the formating tags for titles and normal text
-        my_textbox.tag_configure(
-            "title",
-            font = ("Georgia", "16", "bold"),
-        )
-        my_textbox.tag_configure(
-            "normal",
-            font = ("Georgia", "12"),
-        )
-
-        # Iterate throug all lines
-        for line_number, line in enumerate(text_lines, start=1):
+        # Open the text file and get its lines
+        with open(text_file, "r") as obj_file:
             
-            # Determine if it is a title or not
-            is_title = text_regex.match(line)
+            # Create the formating tags for titles and normal text
+            my_textbox.tag_configure(
+                "title",
+                font = ("Georgia", "16", "bold"),
+            )
+            my_textbox.tag_configure(
+                "normal",
+                font = ("Georgia", "12"),
+            )
+
+            # Iterate through all lines in the file
+            for line in obj_file:
+                
+                # Determine if the line is a title or not
+                is_title = text_regex.match(line)
+                
+                # Add line to the text box
+                if is_title:
+                    # Title (bold and bigger)
+                    my_textbox.insert(tk.END, line, ("title",))
+                else:
+                    # Normal text
+                    my_textbox.insert(tk.END, line, ("normal",))
+                
             
-            # Titles (bold and bigger)
-            if is_title:
-                my_textbox.insert(tk.END, line, ("title",))
-            # Normal text
-            else:
-                my_textbox.insert(tk.END, line, ("normal",))
+            # Disable the text box so the user cannot change the contents (but can still copy)
+            my_textbox["state"] = tk.DISABLED
+
+            # Create the scrollbar for the text box
+            my_scrollbar = tk.Scrollbar(
+                master = my_window,
+                orient = tk.VERTICAL,       # Vertical scrolling
+                command = my_textbox.yview  # Get the vertical position from the text box
+            )
+
+            # Associate the textbox to the scrollbar
+            my_textbox["yscrollcommand"] = my_scrollbar.set
+
+            # Pack the scrollbar to the window
+            my_scrollbar.pack(
+                side = tk.RIGHT,    # Add to the right of the window
+                fill = tk.Y,        # Fill the whole height of the window
+            )
+
+            # Pack the textbox to the window
+            my_textbox.pack(
+                side = tk.RIGHT,    # Add next to the the scrollbar
+                expand = True,      # Text box can be resized
+                fill = tk.BOTH,     # Text box expands to fill all the available space
+            )
+
+            # Close duplicate window
+            if self.open_windows.get(window_title, None):
+                self.open_windows[window_title].destroy()
             
-        
-        # Disable the text box so the user cannot change the contents (but can still copy)
-        my_textbox["state"] = tk.DISABLED
-
-        # Create the scrollbar for the text box
-        my_scrollbar = tk.Scrollbar(
-            master = my_window,
-            orient = tk.VERTICAL,       # Vertical scrolling
-            command = my_textbox.yview  # Get the vertical position from the text box
-        )
-
-        # Associate the textbox to the scrollbar
-        my_textbox["yscrollcommand"] = my_scrollbar.set
-
-        # Pack the scrollbar to the window
-        my_scrollbar.pack(
-            side = tk.RIGHT,    # Add to the right of the window
-            fill = tk.Y,        # Fill the whole height of the window
-        )
-
-        # Pack the textbox to the window
-        my_textbox.pack(
-            side = tk.RIGHT,    # Add next to the the scrollbar
-            expand = True,      # Text box can be resized
-            fill = tk.BOTH,     # Text box expands to fill all the available space
-        )
-
-        # Close duplicate window
-        if self.open_windows.get(window_title, None):
-            self.open_windows[window_title].destroy()
-        
-        # Store the opened window on the dictionary
-        self.open_windows.update({window_title: my_window})
+            # Store the opened window on the dictionary
+            self.open_windows.update({window_title: my_window})
     
     def help(self, *event):
-        """Get the contents from the Help file, and create a window with them.
+        """Create a Help window from the contents of the "Help.txt" file.
         """
-        with open("lib\Help.txt", "r") as file:
-            my_text = file.read()
-        
-        self.__create_window(my_text, "Help")
+        self.__create_window("lib\Help.txt", "Help")
 
     def about(self, *event):
-        """Get the contents from the About file, and create a window with them.
+        """Create a About window from the contents of the "About.txt" file.
         """
-        with open("lib\About.txt", "r") as file:
-            my_text = file.read()
-        
-        self.__create_window(my_text, "About")
+        self.__create_window("lib\Help.txt", "About")
 
 # Instantiate the class
 info_window = new_window(main_window)
