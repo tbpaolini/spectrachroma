@@ -1,0 +1,13 @@
+SpectraChroma - version 1.0
+Author: Tiago Becerra Paolini
+E-mail: tpaolini@gmail.com
+
+Acknowledgements:
+
+The author would like to thank his colleague Guilherme Wiethaus, for the invaluable programming advice.
+And to his supervisor Hermi Felinto de Brito, for the support on his academic life.
+
+This program was built on Python 3.9.4, and made heavy use of the following Open Source modules:
+- Colour 0.3.16 - https://www.colour-science.org/ : for calculating the color coordinates on the CIE 1931 color space and RGB
+- Matplotlib 3.4.1 - https://matplotlib.org/ : for plotting the Chromaticity Diagram and the spectral distributions
+- XlsxWriter 1.4.3 - https://pypi.org/project/XlsxWriter/ : for exporting the color coordinates to Microsoft Excel
