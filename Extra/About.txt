@@ -11,3 +11,5 @@ This program was built on Python 3.9.4, and made heavy use of the following Open
 - Colour 0.3.16 - https://www.colour-science.org/ : for calculating the color coordinates on the CIE 1931 color space and RGB
 - Matplotlib 3.4.1 - https://matplotlib.org/ : for plotting the Chromaticity Diagram and the spectral distributions
 - XlsxWriter 1.4.3 - https://pypi.org/project/XlsxWriter/ : for exporting the color coordinates to Microsoft Excel
+- Tkinter (Tcl/Tk 8.6) - https://docs.python.org/3/library/tkinter.html : for creating the graphical user interface
+- cx_Freeze 6.6 - https://pypi.org/project/cx-Freeze/ : for exporting the program to a Windows executable

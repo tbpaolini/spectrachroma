@@ -1,4 +1,4 @@
-﻿SpectraChroma takes emission spectra in text format and plots its color coordinates on the CIE 1931 Chromaticity Diagram (2° Observer).
+﻿SpectraChroma takes emission spectra in text format and plots its color coordinates on the CIE 1931 Chromaticity Diagram (2° Standard Observer).
 
 --------------------
 
@@ -31,7 +31,7 @@ F4: Show/Hide the data labels
 
 3) Saving the data
 
-The Chromaticity Diagram can be saved by clicking the "Save" button above it, or by going to the menu File > Save chromaticity diagram (shortcut: Ctrl+S). Different formats are available, we recommend saving it to Scalable Vector Graphics (.svg) because this format can be scaled up or down indefinitely without losing resolution (it is worth noting Microsoft Office accepts SVG images). Another valid option is Portable Network Graphics (.png), if SVG is not supported by the program where you want to use the image. PNG images cannot be rescaled indefinitely, though, but they do not lose color information as JPG images usually do.
+The Chromaticity Diagram can be saved by clicking the "Save" button above it, or by going to the menu File > Save chromaticity diagram (shortcut: Ctrl+S). Different formats are available, we recommend saving it to Scalable Vector Graphics (.svg) because this format can be scaled up or down indefinitely without losing resolution (it is worth noting Microsoft Office accepts SVG images). Another good option is Portable Network Graphics (.png), if SVG is not supported by the program where you want to use the image. PNG images cannot be rescaled indefinitely, though, but they do not lose color information as JPG images usually do.
 
 You can save the Spectral Distribution on the menu File > Save spectral distribution (shortcut: Ctrl+D). The available file formats are the same as for the diagram, and the same considerations apply.
 
