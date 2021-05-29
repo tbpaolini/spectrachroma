@@ -18,6 +18,7 @@ main_window.title("SpectraChroma")
 main_window.minsize(840, 590)
 #main_window.iconbitmap("icon.ico")
 main_window.iconphoto(True, tk.PhotoImage(file="lib\icon.png"))
+main_window.after(1, lambda: main_window.focus_force())
 
 
 # Left column - Color and spectrum tables
