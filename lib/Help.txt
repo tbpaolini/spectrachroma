@@ -1,4 +1,4 @@
-﻿SpectraChroma takes emission spectra in text format and plots its color coordinates on the CIE 1931 Chromaticity Diagram (2° Standard Observer).
+SpectraChroma takes emission spectra in text format and plots its color coordinates on the CIE 1931 Chromaticity Diagram (2 Degree Standard Observer).
 
 --------------------
 
@@ -18,7 +18,7 @@ The files that could not be read as a plain text document are ignored.
 
 Once the files are imported, their CIE xy coordinates will be plotted on the Chromaticity Diagram and displayed on the list. The points are labeled counting from 1.
 
-You can click on each item on the list to view its properties on the "color coordinate" frame. It allows you to select and copy (Ctrl+C) a value. The frame also displays an approximation of the emission color, and the spectral distribution on the visible wavelengths’ region (380 to 780 nm).
+You can click on each item on the list to view its properties on the "color coordinate" frame. It allows you to select and copy (Ctrl+C) a value. The frame also displays an approximation of the emission color, and the spectral distribution on the visible wavelengths' region (380 to 780 nm).
 
 You can change the view of the diagram by clicking on the "pan/zoom" button above it. Then to pan the diagram, hold the left mouse button and drag. To zoom the diagram, do the same with the right mouse button. The "configure subplots" button allows you to adjust the margins of the plot. You can reset the view with the "home" button.
 

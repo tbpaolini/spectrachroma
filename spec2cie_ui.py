@@ -2,11 +2,12 @@ import tkinter as tk
 import tkinter.ttk as ttk
 from tkinter.messagebox import (askyesno, showerror)
 from tkinter.filedialog import asksaveasfilename
+from typing import Sized
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
 import matplotlib as mpl
 from numpy import short
 import xlsxwriter as excel
-import os, sys, gc
+import os, sys, gc, re
 from spec2cie import (spectrum_container, plot_container)
 
 #-----------------------------------------------------------------------------
@@ -720,6 +721,125 @@ the shell.
 """
 
 #-----------------------------------------------------------------------------
+# "Help" and "About" windows
+#-----------------------------------------------------------------------------
+
+class new_window():
+    """Create the "Help" and the "About" windows, that are opened from the Help menu.
+    That is done by calling the .help() or the .about() methods.
+    """
+    def __init__(self, parent_window):
+        self.parent_window = parent_window  # Associate the new window to the main window
+        self.open_windows = {}              # Store the open windows so any duplicates can be closed
+    
+    def __create_window(self, text, window_title):
+        """Create a new window with the specified text content and title.
+        """
+        
+        # Create the window
+        my_window = tk.Toplevel(
+            master = self.parent_window,
+        )
+
+        # Set the window's title
+        my_window.title(window_title)
+        
+        # Create the text box
+        my_textbox = tk.Text(
+            master = my_window,
+            font = "TkDefaultFont",
+            wrap = tk.WORD,
+            padx = 5,
+            pady = 5,
+        )
+        
+        # Regular expression to match the titles
+        # (digits followed by closing paranthesis and text)
+        text_regex = re.compile(r"(?m)(^\d+\).*$)")
+        
+        # Divide text into lines
+        text_lines = text.splitlines(True)
+
+        # Create the formating tags for titles and normal text
+        my_textbox.tag_configure(
+            "title",
+            font = ("Georgia", "16", "bold"),
+        )
+        my_textbox.tag_configure(
+            "normal",
+            font = ("Georgia", "12"),
+        )
+
+        # Iterate throug all lines
+        for line_number, line in enumerate(text_lines, start=1):
+            
+            # Determine if it is a title or not
+            is_title = text_regex.match(line)
+            
+            # Titles (bold and bigger)
+            if is_title:
+                my_textbox.insert(tk.END, line, ("title",))
+            # Normal text
+            else:
+                my_textbox.insert(tk.END, line, ("normal",))
+            
+        
+        # Disable the text box so the user cannot change the contents (but can still copy)
+        my_textbox["state"] = tk.DISABLED
+
+        # Create the scrollbar for the text box
+        my_scrollbar = tk.Scrollbar(
+            master = my_window,
+            orient = tk.VERTICAL,       # Vertical scrolling
+            command = my_textbox.yview  # Get the vertical position from the text box
+        )
+
+        # Associate the textbox to the scrollbar
+        my_textbox["yscrollcommand"] = my_scrollbar.set
+
+        # Pack the scrollbar to the window
+        my_scrollbar.pack(
+            side = tk.RIGHT,    # Add to the right of the window
+            fill = tk.Y,        # Fill the whole height of the window
+        )
+
+        # Pack the textbox to the window
+        my_textbox.pack(
+            side = tk.RIGHT,    # Add next to the the scrollbar
+            expand = True,      # Text box can be resized
+            fill = tk.BOTH,     # Text box expands to fill all the available space
+        )
+
+        # Close duplicate window
+        if self.open_windows.get(window_title, None):
+            self.open_windows[window_title].destroy()
+        
+        # Store the opened window on the dictionary
+        self.open_windows.update({window_title: my_window})
+    
+    def help(self, *event):
+        """Get the contents from the Help file, and create a window with them.
+        """
+        with open("lib\Help.txt", "r") as file:
+            my_text = file.read()
+        
+        self.__create_window(my_text, "Help")
+
+    def about(self, *event):
+        """Get the contents from the About file, and create a window with them.
+        """
+        with open("lib\About.txt", "r") as file:
+            my_text = file.read()
+        
+        self.__create_window(my_text, "About")
+
+# Instantiate the class
+info_window = new_window(main_window)
+
+# Make the Help window to be opened the F1 shortcut
+main_window.bind("<F1>", info_window.help)
+
+#-----------------------------------------------------------------------------
 # Menu bar
 #-----------------------------------------------------------------------------
 
@@ -842,7 +962,7 @@ menu_help.add_command(
     label = "Help",
     accelerator = "F1",
     underline = 0,
-    # command = ,
+    command = info_window.help,
 )
 
 menu_help.add_separator()
@@ -850,7 +970,7 @@ menu_help.add_separator()
 menu_help.add_command(
     label = "About",
     underline = 0,
-    # command = ,
+    command = info_window.about,
 )
 
 #-----------------------------------------------------------------------------
