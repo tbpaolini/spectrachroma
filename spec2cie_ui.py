@@ -2,10 +2,8 @@ import tkinter as tk
 import tkinter.ttk as ttk
 from tkinter.messagebox import (askyesno, showerror)
 from tkinter.filedialog import asksaveasfilename
-from typing import Sized
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
 import matplotlib as mpl
-from numpy import short
 import xlsxwriter as excel
 import os, sys, gc, re
 from spec2cie import (spectrum_container, plot_container)
