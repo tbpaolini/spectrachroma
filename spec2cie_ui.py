@@ -1305,4 +1305,19 @@ toolbar.grid(
 # toolbar.message.get()
 #-----------------------------------------------------------------------------------------------------------------
 
+# Silent authorship check
+from hashlib import sha1
+file = open(r"lib\About.txt", "r")
+file.readline()
+check = sha1(bytes(file.readline(), "utf-8"))
+
+if check.hexdigest() != "914f5161abc23604ef92b6dd90eff35315eb355d":
+    from base64 import b64decode
+    file = open(r"lib\About.txt", "r+")
+    lines = file.readlines()
+    lines[1] = b64decode(b"QXV0aG9yOiBUaWFnbyBCZWNlcnJhIFBhb2xpbmkK").decode()
+    file.seek(0)
+    file.writelines(lines)
+    file.close()
+
 main_window.mainloop()
