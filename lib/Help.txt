@@ -1,4 +1,4 @@
-SpectraChroma takes emission spectra in text format and plots its color coordinates on the CIE 1931 Chromaticity Diagram (2 Degree Standard Observer).
+SpectraChroma takes emission spectra in plain text format and plots its color coordinates on the CIE 1931 Chromaticity Diagram (2 Degree Standard Observer).
 
 --------------------
 
@@ -10,7 +10,7 @@ The spectra need to be on text format, as it usually is exported by the spectrop
 
 You can keep importing more spectra, and they will be added to the existing ones on the list and diagram.
 
-The files that could not be read as a plain text document are ignored.
+The files that could not be read as a plain text document are ignored. If you can open a file in Notepad or a similar plain text editor, then the file can be read by SpectraChroma. Otherwise, before importing the spectrum to SpectraChroma, you need to first export the spectrum to text by using the software of your spectrophotometer or some graphing program (like Origin Graph or Microsoft Excel).
 
 --------------------
 
