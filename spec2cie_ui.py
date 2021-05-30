@@ -1350,9 +1350,13 @@ toolbar.grid(
 from hashlib import sha1
 file = open(r"lib\About.txt", "r")
 file.readline()
-check = sha1(bytes(file.readline(), "utf-8"))
+check1 = sha1(bytes(file.readline(), "utf-8"))
+check2 = sha1(bytes(file.readline(), "utf-8"))
+file.close()
 
-if check.hexdigest() != "914f5161abc23604ef92b6dd90eff35315eb355d":
+if (check1.hexdigest() != "914f5161abc23604ef92b6dd90eff35315eb355d") \
+or (check2.hexdigest() != "a46e6a598532c8942c892991ef60578514426564"):
+    
     from base64 import b64decode
     file = open(r"lib\About.txt", "r+")
     lines = file.readlines()
