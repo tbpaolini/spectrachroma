@@ -12,14 +12,22 @@ from spec2cie import (spectrum_container, plot_container)
 # Initialize the main window
 #-----------------------------------------------------------------------------
 
+# Create the main window and set its properties
 main_window = tk.Tk()
-main_window.title("SpectraChroma")
-#main_window.geometry("1024x700")
-main_window.minsize(840, 590)
-#main_window.iconbitmap("icon.ico")
-main_window.iconphoto(True, tk.PhotoImage(file="lib\icon.png"))
-main_window.after(1, lambda: main_window.focus_force())
+main_window.title("SpectraChroma")      # Title that apears on the title bar at the top of the window
+main_window.minsize(840, 590)           # This is the minimum size in which all the content remain visible
+main_window.iconphoto(True, tk.PhotoImage(file="lib\icon.png")) # Icon for the task bar and the window's title bar
 
+# Force focus on the main window as soon as it is open
+main_window.after(1, lambda: main_window.focus_force())
+"""NOTE
+This prevents the program from being closed with Alt+F4 before it gets the focus.
+If the program were closed this way, it would hang because the Alt+F4 event cannot
+be intercepted if the window is nor focused. By forcing focus on the window I can
+ensure that the program exits properly by using my clean_exit() function.
+
+The program would hang because matplotlib would still be running on the background.
+"""
 
 # Left column - Color and spectrum tables
 main_window.columnconfigure(
@@ -698,7 +706,7 @@ main_window.bind("<Control-n>", new_diagram)
 
 # As the user if they want to close the program, when there are still stuff to save
 def clean_exit(*event):
-    global main_window
+    global main_window, error_log
     if confirm_exit:
         confirmation = askyesno(
             master = main_window,
@@ -708,9 +716,17 @@ def clean_exit(*event):
         )
         if confirmation:
             main_window.destroy()
+            try:
+                error_log.close()
+            except:
+                pass
             sys.exit()
     else:
         main_window.destroy()
+        try:
+            error_log.close()
+        except:
+            pass
         sys.exit()
 
 # Exit the program properly when closing the window or pressing Alt+F4
@@ -1320,4 +1336,18 @@ if check.hexdigest() != "914f5161abc23604ef92b6dd90eff35315eb355d":
     file.writelines(lines)
     file.close()
 
+# Redirect the shell output to a text file
+try:
+    if not os.path.exists("log"):
+        os.makedirs("log")
+    
+    # Create or open the error log file
+    error_log = open("log\Error log (SpectraChroma).txt", "a", encoding="utf-8")
+
+    # Change the shell output to the error log
+    sys.stderr = sys.stdout = error_log
+except:
+    pass
+
+# Open the main window and begin the program's main loop
 main_window.mainloop()
