@@ -16,7 +16,7 @@ from spec2cie import (spectrum_container, plot_container)
 main_window = tk.Tk()
 main_window.title("SpectraChroma")      # Title that apears on the title bar at the top of the window
 main_window.minsize(840, 590)           # This is the minimum size in which all the content remain visible
-main_window.iconphoto(True, tk.PhotoImage(file="lib\icon.png")) # Icon for the task bar and the window's title bar
+main_window.iconphoto(True, tk.PhotoImage(file=r"lib\icon.png")) # Icon for the task bar and the window's title bar
 
 # Force focus on the main window as soon as it is open
 main_window.after(1, lambda: main_window.focus_force())
@@ -46,19 +46,19 @@ main_window.columnconfigure(
 # Top row - Toolbar
 main_window.rowconfigure(
     0,
-    weight = 0,
+    weight = 0,     # The toolbar row height will not increase when the window is resized
 )
 
 # Next two rows (left column) - Tables
 main_window.rowconfigure(
     # Color information table
     1,
-    weight = 2,
+    weight = 2,     # When the window is resized, this row increases more than the Treeview row
 )
 main_window.rowconfigure(
-    # Treeview table
+    # Treeview table (list of spectra and their color coordinates)
     2,
-    weight = 1,
+    weight = 1,     # When the window is resized, this row increases less than the color info row
 )
 
 #-----------------------------------------------------------------------------
@@ -1072,11 +1072,13 @@ canvas_sd.get_tk_widget().pack(
         fill = tk.BOTH,
     )
 
+# Add the frame to the window
+
 frame_sd.grid(
     column = 0,
     row = 4,
     columnspan = 3,
-    sticky = "nsew",
+    sticky = "nsew",    # Expands to fill the whole cell
     padx = 3,
     pady = 3,
 )
@@ -1089,7 +1091,7 @@ cell_spectrum_title.grid(
     column = 0,
     row = 0,
     columnspan = 3,
-    sticky = "we",
+    sticky = "we",      # Expands to fill the cell horizontaly
     padx = cell_padding,
 )
 
@@ -1124,18 +1126,18 @@ cell_color_display.grid(
     column = 2,
     row = 1,
     rowspan = 3,
-    sticky = "nsew",
+    sticky = "nsew",    # Expands to fill the whole cell
     padx = cell_padding,
     ipady = cell_padding,
 )
 
 frame_color_info.columnconfigure(
     2,
-    weight = 1,
+    weight = 1,     # The color column expands if the window is resized
 )
 frame_color_info.rowconfigure(
     4,
-    weight = 1,
+    weight = 1,     # The color row expands if the window is resized
 )
 
 # Add the frame to the main window
@@ -1143,7 +1145,7 @@ frame_color_info.grid(
     column = 0,
     row = 0,
     rowspan = 2,
-    sticky = "nsew",
+    sticky = "nsew",    # Expands to fill the whole cell
     padx = 3,
     pady = 3,
 )
@@ -1235,20 +1237,28 @@ frame_tree_spectrum.grid(
     pady = 3,
 )
 
-#-----------------------------------------------------------------------------------------------------------------
 
+#-----------------------------------------------------------------------------
+# Create the Chromaticity Diagram
+#-----------------------------------------------------------------------------
+
+# Create the frame to hold the diagram's canvas
 frame_cie = tk.Frame(
     master = main_window,
     borderwidth = 2,
     relief = tk.SUNKEN,
 )
+
+# Create the canvas for the Chromaticity Duagram
 canvas_CIE = FigureCanvasTkAgg(plot.fig_CIE, master = frame_cie)
+
+# Add the canvas to the frame
 canvas_CIE.get_tk_widget().pack(
     expand = True,
     fill = tk.BOTH,
 )
 
-
+# Add the frame to the window
 frame_cie.grid(
     column = 1,
     row = 1,
@@ -1258,7 +1268,13 @@ frame_cie.grid(
     pady = 3,
 )
 
+# Draw the Chromaticity Diagram on the canvas
 canvas_CIE.draw()
+
+
+#-----------------------------------------------------------------------------
+# Toolbar for the Chromaticity Diagram
+#-----------------------------------------------------------------------------
 
 # Modify the save_figure() method of the  avigationToolbar2Tk class
 """NOTE
@@ -1310,16 +1326,23 @@ class NavigationToolbar2Tk_modified(NavigationToolbar2Tk):
         except Exception as e:
             tk.messagebox.showerror("Error saving file", str(e))
 
+# Create the toolbar
 toolbar = NavigationToolbar2Tk_modified(canvas_CIE, main_window, pack_toolbar=False)
 toolbar.update()
+
+# Add the toolbar to the window
 toolbar.grid(
     column = 1,
     row = 0,
-    sticky = "w",
+    sticky = "w",   # Attach the toolbar to the left corner of the cell
 )
 
 # toolbar.message.get()
-#-----------------------------------------------------------------------------------------------------------------
+
+
+#-----------------------------------------------------------------------------
+# Opening the main window
+#-----------------------------------------------------------------------------
 
 # Silent authorship check
 from hashlib import sha1
@@ -1338,6 +1361,7 @@ if check.hexdigest() != "914f5161abc23604ef92b6dd90eff35315eb355d":
 
 # Redirect the shell output to a text file
 try:
+    # Create the "log" folder if it doesn't exist
     if not os.path.exists("log"):
         os.makedirs("log")
     

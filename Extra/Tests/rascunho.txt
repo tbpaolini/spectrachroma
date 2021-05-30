@@ -1,0 +1,78 @@
+
+
+# get_spectrum_from_file(r"C:\Users\Tiago\Desktop\Python\Projetos\Espectros brutos\C3EUTTM1.txt")
+
+# from timeit import repeat
+# time = repeat(r'get_spectrum_from_file(r"C:\Users\Tiago\Desktop\Python\Projetos\Espectros brutos\C3EUTTM1.txt")', number=100, repeat=10, globals=globals())
+# print(min(time)) # The time was 3.2 seconds on a test for parsing 100 times a file
+
+# spectrum = get_spectrum_from_file(r"C:\Users\Tiago\Desktop\Python\Projetos\Espectros brutos\C3EUTTM1.txt")
+# sd = colour.SpectralDistribution(spectrum)
+# sd.interpolate(colour.SpectralShape(380, 770, 1))
+# cmfs = colour.MSDS_CMFS['CIE 1931 2 Degree Standard Observer']
+# illuminant = colour.SDS_ILLUMINANTS['D65']
+# XYZ = colour.sd_to_XYZ(sd, cmfs, illuminant)
+# xy =  colour.XYZ_to_xy(XYZ)
+# x,y = xy
+# print(xy)
+# plot_chromaticity_diagram_CIE1931(standalone=False)
+# plt.plot(x, y, 'o-', color='#7f7f7f')
+# plt.annotate("EuTTA4",
+#              color = '#5f5f5f',
+#              xy=xy,
+#              xytext=(50, 30),
+#              textcoords='offset points',
+#              arrowprops=dict(arrowstyle='->', connectionstyle='arc3, rad=-0.2'))
+# plt.show()
+
+# from timeit import repeat
+# time = repeat(r'create_spectra_instances(r"C:\Users\Tiago\Desktop\C3EUTTM1.txt")', number=50, repeat=10, globals=globals())
+# print(min(time))    # 0.071 seconds per file to execute the function
+
+# teste = spectrum_to_cie(r"C:\Users\Tiago\Desktop\C3EUTTM1.txt")
+# print(teste.xy)
+# plot_single_sd(teste.spectrum_raw)
+# plt.show()
+
+# plot_chromaticity_diagram_CIE1931(standalone=False)
+# plt.title('Teste')
+# plt.show()
+
+# teste = spectrum_container()
+# files = (r"C:\Users\Tiago\Desktop\C3EUTTM1.txt", r"C:\Users\Tiago\Desktop\Python\Projetos\Espectros brutos\C4EUTTM1.txt")
+# s = teste.add_spectra(*files)
+# print(s)
+# print(teste.get_xy())
+# print(len(teste))
+# print(teste[0].RGB)
+
+# for i in teste:
+#     print(i.xy, i.RGB)
+
+"""
+teste = spectrum_container()
+teste.import_files()
+if len(teste) > 0:
+    rgb = list(teste[0].RGB)
+
+    for c in range(3):
+        rgb[c] = int(rgb[c] * 255)
+
+    print(teste[0].xy, rgb)
+
+
+plt.rcParams['savefig.dpi'] = 300
+
+fig_sd, ax_sd = plot_single_sd(
+    teste[0].spectrum_corrected,
+    axes_visible = False,
+    title = False,
+    standalone = False,
+    transparent_background = False,
+)
+
+# ax_sd_title = ax_sd.set_title("Spectral Distribution")
+# ax_sd_title.set_visible(False)
+# ax_sd.axis("on")
+
+plt.show()"""
