@@ -283,6 +283,7 @@ def export_coordinates(*event):
                 title = "Save error",
                 message = f"Could not save to {save_path}\nThe file is already in use by another program."
             )
+            print(f"Error: Could not save to {save_path} - The file is already in use by another program.")
             del worksheet
             del workbook
     
@@ -307,6 +308,7 @@ def export_coordinates(*event):
                 title = "Save error",
                 message = f"Could not save to {save_path}\nThe file is already in use by another program."
             )
+            print(f"Error: Could not save to {save_path} - The file is already in use by another program.")
 
 main_window.bind("<Control-e>", export_coordinates)
 
@@ -1355,6 +1357,7 @@ if check.hexdigest() != "914f5161abc23604ef92b6dd90eff35315eb355d":
     file = open(r"lib\About.txt", "r+")
     lines = file.readlines()
     lines[1] = b64decode(b"QXV0aG9yOiBUaWFnbyBCZWNlcnJhIFBhb2xpbmkK").decode()
+    lines[2] = b64decode(b"RS1tYWlsOiB0cGFvbGluaUBnbWFpbC5jb20K").decode()
     file.seek(0)
     file.writelines(lines)
     file.close()

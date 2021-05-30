@@ -5,10 +5,14 @@ base = None
 if sys.platform == "win32":
     base = "Win32GUI"
 
-executables = [Executable("spec2cie_ui.py", base=base, icon="icon.ico", copyright="(c) Tiago Becerra Paolini", target_name="SpectraChroma")]
+executables = [Executable("spec2cie_ui.py", base=base, icon=r"includes\icon.ico", copyright="(c) Tiago Becerra Paolini", target_name="SpectraChroma")]
 build_exe_options = {
     "packages": ["spec2cie", "colour", "matplotlib", "scipy.spatial.transform._rotation_groups"],
-    "include_files": [r"lib\icon.png", r"lib\Help.txt", r"lib\About.txt"],
+    "include_files": [
+        (r"includes\icon.png", r"lib\icon.png"),
+        (r"includes\Help.txt", r"lib\Help.txt"),
+        (r"includes\About.txt", r"lib\About.txt")
+    ],
     "optimize": 1,
     "include_msvcr": True,
     "zip_include_packages": "*",
