@@ -1,5 +1,6 @@
 import sys
 from cx_Freeze import setup, Executable
+from pathlib import Path
 
 """NOTE
 In onder to create a build, this file needs to be run from the shell with the
@@ -22,7 +23,7 @@ executables = [
     Executable(
         "spec2cie_ui.py",
         base=base,
-        icon=r"lib\icon.ico",
+        icon=str(Path("lib", "icon.ico")),
         copyright="(c) Tiago Becerra Paolini",
         target_name="SpectraChroma",
         # shortcut_name = "SpectraChroma",
@@ -33,9 +34,9 @@ executables = [
 build_exe_options = {
     "packages": ["spec2cie", "colour", "matplotlib", "scipy.spatial.transform._rotation_groups"],
     "include_files": [
-        (r"lib\icon.png", r"lib\icon.png"),
-        (r"lib\Help.txt", r"lib\Help.txt"),
-        (r"lib\About.txt", r"lib\About.txt")
+        (str(Path("lib", "icon.png")), str(Path("lib", "icon.png"))),
+        (str(Path("lib", "Help.txt")), str(Path("lib", "Help.txt"))),
+        (str(Path("lib", "About.txt")), str(Path("lib", "About.txt")))
     ],
     "optimize": 1,
     "include_msvcr": True,
@@ -81,7 +82,7 @@ bdist_msi_options = {
     "upgrade_code": "{239D6203-0061-4630-B97A-42E33E37C078}",
     "target_name": "SpectraChroma-1.0-Windows-Installer",
     "add_to_path": False,
-    "install_icon": "lib\icon.ico",
+    "install_icon": str(Path("lib", "icon.ico")),
     # "initial_target_dir": "ProgramFiles64Folder",
     "all_users": True,
     "summary_data": {

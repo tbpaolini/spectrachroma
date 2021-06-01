@@ -7,6 +7,7 @@ import matplotlib as mpl
 import xlsxwriter as excel
 import os, sys, gc, re
 from spec2cie import (spectrum_container, plot_container)
+from pathlib import Path
 
 #-----------------------------------------------------------------------------
 # Initialize the main window
@@ -16,7 +17,7 @@ from spec2cie import (spectrum_container, plot_container)
 main_window = tk.Tk()
 main_window.title("SpectraChroma")      # Title that apears on the title bar at the top of the window
 main_window.minsize(840, 590)           # This is the minimum size in which all the content remain visible
-main_window.iconphoto(True, tk.PhotoImage(file=r"lib\icon.png")) # Icon for the task bar and the window's title bar
+main_window.iconphoto(True, tk.PhotoImage(file=Path("lib", "icon.png"))) # Icon for the task bar and the window's title bar
 
 # Force focus on the main window as soon as it is open
 main_window.after(1, lambda: main_window.focus_force())
@@ -852,12 +853,12 @@ class new_window():
     def help(self, *event):
         """Create a Help window from the contents of the "Help.txt" file.
         """
-        self.__create_window("lib\Help.txt", "Help")
+        self.__create_window(Path("lib", "Help.txt"), "Help")
 
     def about(self, *event):
         """Create a About window from the contents of the "About.txt" file.
         """
-        self.__create_window("lib\About.txt", "About")
+        self.__create_window(Path("lib", "About.txt"), "About")
 
 # Instantiate the class
 info_window = new_window(main_window)
@@ -1348,7 +1349,7 @@ toolbar.grid(
 
 # Silent authorship check
 from hashlib import sha1
-file = open(r"lib\About.txt", "r")
+file = open(Path("lib", "About.txt"), "r")
 file.readline()
 check1 = sha1(bytes(file.readline(), "utf-8"))
 check2 = sha1(bytes(file.readline(), "utf-8"))
@@ -1358,7 +1359,7 @@ if (check1.hexdigest() != "914f5161abc23604ef92b6dd90eff35315eb355d") \
 or (check2.hexdigest() != "a46e6a598532c8942c892991ef60578514426564"):
     
     from base64 import b64decode
-    file = open(r"lib\About.txt", "r+")
+    file = open(Path("lib", "About.txt"), "r+")
     lines = file.readlines()
     lines[1] = b64decode(b"QXV0aG9yOiBUaWFnbyBCZWNlcnJhIFBhb2xpbmkK").decode()
     lines[2] = b64decode(b"RS1tYWlsOiB0cGFvbGluaUBnbWFpbC5jb20K").decode()
@@ -1373,7 +1374,7 @@ try:
         os.makedirs("log")
     
     # Create or open the error log file
-    error_log = open("log\Error log (SpectraChroma).txt", "a", encoding="utf-8")
+    error_log = open(Path("lib", "About.txt"), "a", encoding="utf-8")
 
     # Change the shell output to the error log
     sys.stderr = sys.stdout = error_log
