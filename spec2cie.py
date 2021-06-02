@@ -1,4 +1,4 @@
-import colour, re, gc
+import colour, re, gc, sys
 import matplotlib.pyplot as plt
 from colour.plotting import *
 from tkinter.filedialog import askopenfilenames
@@ -217,9 +217,28 @@ class spectrum_container():
         Then parse the files, calculate the color data, and stores it in an object inside the spectrum container.
         """
 
+        if sys.platform == "win32":
+            text_extensions = ("Text files", "*.txt;*.csv;*.prn;*.dat;*.asc")
+        else:
+            text_extensions = ("Text files", "*.txt")
+        """NOTE
+        Unlike Windows, Linux's "open file" dialog does not accept multiple
+        extensions for a single file type. Or at least I was not able to find
+        an way to. So I added this check to only include the "*.txt" extension
+        for text files if the Operating System is not Windows.
+
+        The other formats I included for Windows are all extensions that I saw
+        an laboratory instrument generating when exporting data to text. Most
+        of the extensions are from older equipment, nowadays it seems to be
+        just regular "*.txt" extension, but I included the others for the
+        sake of convenience.
+
+        All of them in the end of the day are just plan text documents.
+        """
+
         file_list = askopenfilenames(
             parent = self.window,
-            filetypes = (("Text files", "*.txt;*.csv;*.prn;*.dat"), ("All files", "*.*")),
+            filetypes = (text_extensions, ("All files", "*.*")),
             title = "Import spectra"
         )
 
