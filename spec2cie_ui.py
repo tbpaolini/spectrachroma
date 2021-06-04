@@ -265,7 +265,7 @@ def export_coordinates(*event):
         worksheet.set_column_pixels(4, 4, 95)   # 95 pixels wide
         """NOTE
         It is not possible to do an "auto fit" column through code, only when viewing the file on Excel.
-        The correlation between the width of the column and the number of characters is now trivial,
+        The correlation between the width of the column and the number of characters is not trivial,
         it depends on the screen resolution and the default font (which can have variable character width).
         More info: https://docs.microsoft.com/en-US/office/troubleshoot/excel/determine-column-widths
                    https://xlsxwriter.readthedocs.io/worksheet.html#set_column
@@ -370,7 +370,7 @@ def update_color_info(event):
     if previous_sd:
         previous_sd.set_visible(False)  # Switch off the previous distribution
     current_sd.set_visible(True)        # Switch on the current distribution
-    canvas_sd.draw()                    # Update the canvas so the distribution is show
+    canvas_sd.draw()                    # Update the canvas so the distribution is shown
 
 # Bind the function to the Treeview Select event
 main_window.bind("<<TreeviewSelect>>", update_color_info)
@@ -472,7 +472,7 @@ def toggle_axis(*event, reset=False):
 main_window.bind("<F3>", toggle_axis)
 
 
-#--- Toggle grid lines on the Chromaticity Diagram ---#
+#--- Toggle labels on the Chromaticity Diagram ---#
 
 def toggle_labels(*event, reset=False):
     """Switch on/off the data labels on the Chromaticity Diagram
@@ -492,12 +492,12 @@ def toggle_labels(*event, reset=False):
         show_labels.set(True)
     
     # Display or remove the grid lines
-    if show_labels.get():                     # Axes are enabled
-        plot.show_labels_cie(True)              # Display axes
+    if show_labels.get():           # Labels are enabled
+        plot.show_labels_cie(True)  # Display labels
         canvas_CIE.draw()
     
-    else:                                   # Axes are disabled
-        plot.show_labels_cie(False)             # Hide axes
+    else:                           # Labels are disabled
+        plot.show_labels_cie(False) # Hide labels
         canvas_CIE.draw()
 
 # Bind the function to the F4 shortcut
@@ -703,6 +703,7 @@ def new_diagram(*event):
     # Reset to the original view
     toolbar.home()
 
+# Bind the function to the Ctrl+N shortcut
 main_window.bind("<Control-n>", new_diagram)
 
 #--- Exiting the program ---#
@@ -786,7 +787,7 @@ class new_window():
         )
 
         # Remove window from the dictionary when it is closed
-        # (when the windo closes, it trigers the "Destroy" event of the text box)
+        # (when the window closes, it trigers the "Destroy" event of the text box)
         my_textbox.bind("<Destroy>", lambda event: self.open_windows.update({window_title: None}))
         
         # Regular expression to match the titles
@@ -819,7 +820,6 @@ class new_window():
                 else:
                     # Normal text
                     my_textbox.insert(tk.END, line, ("normal",))
-                
             
             # Disable the text box so the user cannot change the contents (but can still copy)
             my_textbox["state"] = tk.DISABLED
@@ -863,7 +863,7 @@ class new_window():
 # Instantiate the class
 info_window = new_window(main_window)
 
-# Make the Help window to be opened the F1 shortcut
+# Make the Help window to be opened with the F1 shortcut
 main_window.bind("<F1>", info_window.help)
 
 #-----------------------------------------------------------------------------
@@ -873,7 +873,7 @@ main_window.bind("<F1>", info_window.help)
 # Disable detachable menus
 main_window.option_add("*tearOff", tk.FALSE)
 
-# Create menu bar on the main window
+# Create the menu bar on the main window
 menubar = tk.Menu(main_window)
 main_window["menu"] = menubar
 
@@ -1279,7 +1279,7 @@ canvas_CIE.draw()
 # Toolbar for the Chromaticity Diagram
 #-----------------------------------------------------------------------------
 
-# Modify the save_figure() method of the  avigationToolbar2Tk class
+# Modify the .save_figure() method of the NavigationToolbar2Tk class
 """NOTE
 The only change I am making is to add en event generated when the figure is successfully saved.
 That event is used to toggle off the exit confirmation after the figure is saved.

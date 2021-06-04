@@ -86,7 +86,7 @@ class spectrum_to_cie:
             (Y = 1 is the maximum luminance on the sRGB color space)
             (Y = 0 would be no luminance: you would see no color)
             """
-            self.R, self.G, self.B = self.RGB   # For convenience, store the values on separate variables as floats
+            self.R, self.G, self.B = self.RGB   # For convenience, also store the values on separate variables as floats
     
     def get_spectrum_from_file(self, file_path):
         """Extracts the spectral coordinates (x,y) from a text file,
@@ -250,7 +250,7 @@ class spectrum_container():
         success_count = 0
         for file in file_list:
             
-            # Spectrum object
+            # Instantiate spectrum object
             obj_spectrum = spectrum_to_cie(file)   # Parse the file and calculate the color coordinates
             
             if obj_spectrum.success:
@@ -259,7 +259,7 @@ class spectrum_container():
             
         if success_count > 0:
             if self.window:
-                # Generate an event for Tkinter (so we can automatically update the diagram)
+                # Generate an event for Tkinter (so we can automatically update the diagram and the rest of the window)
                 self.window.event_generate("<<FilesImported>>", when="tail")
                 self.window.update()
             return True
@@ -307,14 +307,14 @@ class plot_container():
         )
         """NOTE:
         "standalone = False" means that the figure isn't rendered yet, so it
-        is still opened for plotting the coordinates.
+        is still open for plotting the coordinates.
         
         Setting "transparent_background = False" actually makes the background
         transparent, in spite of what the parameter name might suggest. We are
         making axes background transparent so we can set the figure to black
         and get the plot on a dark background too.
 
-        "show_spectral_locus = False" makes prevents the function from drawing
+        "show_spectral_locus = False" prevents the function from drawing
         the wavelenghts around the spectrum. I don't like the style that the
         module use for the locus, however the module doesn't allow to change
         it easily. The locus will be drawn later, through a custom method, with
@@ -396,7 +396,7 @@ class plot_container():
             # Set the position of the tick labels according to their values,
             # so they don't overlap the diagram
             if point < 520:
-                my_xytext = (-7, 0)    # Text position in relation to the tick
+                my_xytext = (-7, 0)     # Text position in relation to the tick
                 my_va = "center"        # Vertical alignment of the text in relation to the tick
                 my_ha = "right"         # Horizontal alignment of the text in relation to the tick
             elif point > 520:
@@ -442,7 +442,7 @@ class plot_container():
         """
         self.scatter_CIE = []
 
-        # Initialize the figure for the spectral distributions (sd)
+        # Create the figure for the spectral distributions (sd)
         """NOTE
         To speed up things, I am using a single figure with multiple axes (one for each sd).
         Then I will make the figure to render only one axis at a time.
@@ -478,7 +478,7 @@ class plot_container():
         for point in range(self.points_count, self.points_count + len_CIEx):
 
             my_label = self.ax_CIE.annotate(point + 1,          # The result of "point+1" is the text annotated to the current point
-                color = "white",
+                color = "white",                                # Color of the annotated text
                 xy = (CIEx[point_index], CIEy[point_index]),    # Coordinate of the point
                 xytext = (0, 0),                                # Place the text on the same coordinate as the point
                 textcoords = "offset points",                   # Coordinates relative to the point
@@ -488,7 +488,7 @@ class plot_container():
                 fontweight = "bold",                            # Bold text
                 fontsize = 6,                                   # Text with size of 6 points
                 bbox = dict(
-                    boxstyle = "circle",                        # Place the text in a solid circle
+                    boxstyle = "circle",                        # Place the text inside a solid circle
                     color = "#212121",                          # Color of the circle
                 )
             )

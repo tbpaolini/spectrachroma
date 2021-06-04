@@ -3,16 +3,29 @@ from cx_Freeze import setup, Executable
 from pathlib import Path
 
 """NOTE
-In onder to create a build, this file needs to be run from the shell with the
-"build" or "bdist_msi" parameters (without the quotes):
+In order to build a SpectraChroma executable you need to have installed Python 3,
+and the following Python modules (and their dependencies):
+    colour-science
+    matplotlib
+    XlsxWriter
+    cx_freeze
+
+If you are on Ubuntu (Linux), you also need to install these Linux packages:
+    python3-tk
+    patchelf
+
+Once those requirements are installed, open a shell (command prompt) on the
+directory where is SpectraChroma's source and run the one of following commands:
     python setup.py build
     python setup.py bdist_msi
 
-build: creates only a standalone Windows program (no installation required)
-bdist_msi: creates a Windows installer for the program, AND a standalone program
+If you are on Linux, you might need to use the command "python3" instead of "python".
+The argument "build" only creates a standalone program for Windows or Linux (depending
+on which Operating System you are using). The argument "bdist_msi" creates both a
+standalone program and a Windows installer (needless to say, this only works on Windows).
 
-The standalone version goes to the "build" folder, while the installer goes to
-the "dist" folder.
+After the script finishes running, the standalone program is placed on the "build"
+subdirectory, while the installer goes to the "dist" subdirectory.
 """
 
 base = None
