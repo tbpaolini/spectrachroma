@@ -1,7 +1,7 @@
 # SpectraChroma
 SpectraChroma is a software for calculating and plotting the color coordinates of emission spectra in the CIE 1931 Chromaticity Diagram (2 Degree Standard Observer).
 
-![SpectraChroma's screenshot](https://github.com/tbpaolini/spectrachroma/blob/master/assets/screenshots/SpectraChroma%20-%20v1.0.0.png)
+![SpectraChroma's screenshot](https://github.com/tbpaolini/spectrachroma/raw/master/assets/screenshots/SpectraChroma%20-%20v1.0.0.png)
 
 ## Features:
 * Import multiple spectra at once
