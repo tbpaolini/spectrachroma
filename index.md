@@ -1,37 +1,44 @@
-## Welcome to GitHub Pages
+# SpectraChroma
+SpectraChroma is a software for calculating and plotting the color coordinates of emission spectra in the CIE 1931 Chromaticity Diagram (2 Degree Standard Observer).
 
-You can use the [editor on GitHub](https://github.com/tbpaolini/spectrachroma/edit/gh-pages/index.md) to maintain and preview the content for your website in Markdown files.
+![SpectraChroma's screenshot](https://github.com/tbpaolini/spectrachroma/blob/master/assets/screenshots/SpectraChroma%20-%20v1.0.0.png)
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+## Features:
+* Import multiple spectra at once
+* Automatic data labeling
+* Can save the Chromaticity Diagram in several image formats (including SVG, PNG, JPG, TIFF)
+* Chromaticity Diagram customization by showing/hiding the axes, grid lines, and data labels
+* Display the CIE color coordinates and the calculated perceived color
+* Export all CIE color coordinates and the perceived colors to Microsoft Excel or plain text
 
-### Markdown
+## Downloads
+SpectraChroma runs on Windows and Linux, without the need of installation. Just unzip and run the program:
+* [Windows 10 64-bit (standalone)](https://github.com/tbpaolini/spectrachroma/releases/download/v1.0.0/SpectraChroma.1.0.0-Windows_10-x64.zip)
+* [Linux (Ubuntu 20.04) 32/64-bit](https://github.com/tbpaolini/spectrachroma/releases/download/v1.0.0/SpectraChroma_1.0.0-Linux-x86_64.zip)
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+Optionally, an Windows installer is also available:
+* [Windows Installer (64-bit)](https://github.com/tbpaolini/spectrachroma/releases/download/v1.0.0/SpectraChroma_1.0.0-Windows_Installer-x64.msi)
 
-```markdown
-Syntax highlighted code block
+**Note:** *the program may work on earlier versions of Windows and other flavors of Linux, but that is not guaranteed. Windows 10 and Ubuntu 20.04 are the versions in which SpectraChroma as built and tested into.*
 
-# Header 1
-## Header 2
-### Header 3
+As a matter of convenience, some sample spectra are provided to be tested with SectraChroma:
+* [Sample data](https://github.com/tbpaolini/spectrachroma/releases/download/v1.0.0/Sample_data-SpectraChroma.zip)
 
-- Bulleted
-- List
+## Source Code
+SpectraChroma is written in Python 3.9.4 and was exported to Windows and Linux executables using [cx_Freeze](https://marcelotduarte.github.io/cx_Freeze/), which means that no Python installation is required to run the executables.
 
-1. Numbered
-2. List
+But you can still get SpectraChorma's source code in Python, so you can run it in Python or build the executable yourself:
+* [Source code (Python 3.9.4)](https://github.com/tbpaolini/spectrachroma/archive/refs/tags/v1.0.0.zip)
 
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
+The following Python modules (and their dependencies) are required to run SpectraChroma from the source: `colour-science`, `matplotlib`, and `XlsxWriter`. To install all at once, you can run this command on the shell:
+```sh
+pip install colour-science matplotlib XlsxWriter
 ```
 
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
+Aditionally, if you are on Ubuntu (Linux), you might need to also install the package `python3-tk`:
+```sh
+sudo apt-get install python3-tk
+```
 
-### Jekyll Themes
-
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/tbpaolini/spectrachroma/settings/pages). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://support.github.com/contact) and we’ll help you sort it out.
+## About
+SpectraChroma was made by Tiago Becerra Paolini (PhD in Chemistry), with valuable programming advice from Guilherme Wiethaus (professional programmer and MD in Chemistry).
