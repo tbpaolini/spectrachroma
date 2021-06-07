@@ -97,7 +97,7 @@ msi_data = {"Shortcut": shortcut_table}
 bdist_msi_options = {
     "product_code": "{A2536964-4A51-43F1-AC11-7E0D64296FC1}",
     "upgrade_code": "{239D6203-0061-4630-B97A-42E33E37C078}",
-    "target_name": "SpectraChroma-1.0-Windows-Installer",
+    "target_name": "SpectraChroma-1.0.1-Windows-Installer",
     "add_to_path": False,
     "install_icon": str(Path("lib", "icon.ico")),
     # "initial_target_dir": "ProgramFiles64Folder",
