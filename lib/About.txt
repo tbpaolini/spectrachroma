@@ -1,6 +1,8 @@
-SpectraChroma - version 1.0
+SpectraChroma - version 1.0.1
 Author: Tiago Becerra Paolini
 E-mail: tpaolini@gmail.com
+Website: https://tbpaolini.github.io/spectrachroma/
+DOI: (to be issued)
 
 1) Acknowledgements
 

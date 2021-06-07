@@ -1,0 +1,3 @@
+Please cite SpectraChroma on your work as:
+
+(The DOI - Digital Object Identifier - had not been issued yet at the time this software version was archived. This text on the redistributable will be edited to include the proper citation for SpectraChroma.)

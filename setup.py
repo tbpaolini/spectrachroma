@@ -49,7 +49,11 @@ build_exe_options = {
     "include_files": [
         (str(Path("lib", "icon.png")), str(Path("lib", "icon.png"))),
         (str(Path("lib", "Help.txt")), str(Path("lib", "Help.txt"))),
-        (str(Path("lib", "About.txt")), str(Path("lib", "About.txt")))
+        (str(Path("lib", "About.txt")), str(Path("lib", "About.txt"))),
+        (str(Path("lib", "License.txt")), "License.txt"),
+        (str(Path("lib", "License.txt")), str(Path("lib", "License.txt"))),
+        (str(Path("lib", "Citation.txt")), "Citation.txt"),
+        (str(Path("lib", "Citation.txt")), str(Path("lib", "Citation.txt"))),
     ],
     "optimize": 1,
     "include_msvcr": True,
@@ -91,7 +95,7 @@ shortcut_table = [
 msi_data = {"Shortcut": shortcut_table}
 
 bdist_msi_options = {
-    "product_code": "{84E3FDE9-F250-4FEE-8C2A-E6162ED74632}",
+    "product_code": "{A2536964-4A51-43F1-AC11-7E0D64296FC1}",
     "upgrade_code": "{239D6203-0061-4630-B97A-42E33E37C078}",
     "target_name": "SpectraChroma-1.0-Windows-Installer",
     "add_to_path": False,

@@ -747,8 +747,12 @@ the shell.
 #-----------------------------------------------------------------------------
 
 class new_window():
-    """Create the "Help" and the "About" windows, that are opened from the Help menu.
-    That is done by calling the .help() or the .about() methods.
+    """Create the Help menu windows, that are opened from the Help menu.
+    That is done by calling one of the methods:
+        .help()
+        .about()
+        .cite()
+        .license()
     """
     def __init__(self, parent_window):
         self.parent_window = parent_window  # Associate the new window to the main window
@@ -849,6 +853,9 @@ class new_window():
             
             # Store the opened window on the dictionary
             self.open_windows.update({window_title: my_window})
+
+            # Bring the opened window to the front
+            my_window.focus_force()
     
     def help(self, *event):
         """Create a Help window from the contents of the "Help.txt" file.
@@ -859,6 +866,16 @@ class new_window():
         """Create a About window from the contents of the "About.txt" file.
         """
         self.__create_window(Path("lib", "About.txt"), "About")
+    
+    def license(self, *event):
+        """Create a license information window.
+        """
+        self.__create_window(Path("lib", "License.txt"), "Licence")
+    
+    def cite(self, *event):
+        """Create a "How to cite" window
+        """
+        self.__create_window(Path("lib", "Citation.txt"), "Citation")
 
 # Instantiate the class
 info_window = new_window(main_window)
@@ -992,7 +1009,19 @@ menu_help.add_command(
     command = info_window.help,
 )
 
+menu_help.add_command(
+    label = "How to cite",
+    underline = 7,
+    command = info_window.cite,
+)
+
 menu_help.add_separator()
+
+menu_help.add_command(
+    label = "License",
+    underline = 0,
+    command = info_window.license,
+)
 
 menu_help.add_command(
     label = "About",
