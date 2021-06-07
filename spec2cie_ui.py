@@ -870,7 +870,7 @@ class new_window():
     def license(self, *event):
         """Create a license information window.
         """
-        self.__create_window(Path("lib", "License.txt"), "Licence")
+        self.__create_window(Path("lib", "License.txt"), "License")
     
     def cite(self, *event):
         """Create a "How to cite" window
