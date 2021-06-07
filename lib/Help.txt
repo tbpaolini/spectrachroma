@@ -46,3 +46,11 @@ You can select spectra on the list and remove them by pressing the Delete key (o
 You can also remove all the spectra by going to the menu File > New diagram (shortcut: Ctrl+N). This also resets the diagram to the default view.
 
 It is worth noting that removing spectra from SpectraChroma WILL NOT DELETE the original spectrum files from the disk. This might be obvious, but it is good to just be sure :-)
+
+--------------------
+
+5) How to cite SpectraChroma
+
+Please cite SpectraChroma on your work as:
+
+Paolini, T. B. (2021). SpectraChroma (Version 1.0.1) [Computer software]. https://doi.org/10.5281/zenodo.4906589
