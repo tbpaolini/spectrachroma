@@ -112,7 +112,7 @@ bdist_msi_options = {
 
 setup(
     name="SpectraChroma",
-    version="1.0.0",
+    version="1.0.1",
     description="Spectrum to CIE 1931 Chromaticity Diagram",
 	options = {"build_exe": build_exe_options, "bdist_msi": bdist_msi_options},
     executables=executables,
