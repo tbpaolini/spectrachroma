@@ -13,22 +13,22 @@ SpectraChroma is a software for calculating and plotting the color coordinates o
 
 ## Downloads
 SpectraChroma runs on Windows and Linux, without the need of installation. Just unzip and run the program:
-* [Windows 10 64-bit (standalone)](https://github.com/tbpaolini/spectrachroma/releases/download/v1.0.0/SpectraChroma.1.0.0-Windows_10-x64.zip)
-* [Linux (Ubuntu 20.04) 32/64-bit](https://github.com/tbpaolini/spectrachroma/releases/download/v1.0.0/SpectraChroma_1.0.0-Linux-x86_64.zip)
+* [Windows 10 64-bit (standalone)](https://github.com/tbpaolini/spectrachroma/releases/download/v1.0.1/SpectraChroma.1.0.1-Windows_10-x64.zip)
+* [Linux (Ubuntu 20.04) 32/64-bit](https://github.com/tbpaolini/spectrachroma/releases/download/v1.0.1/SpectraChroma_1.0.1-Linux-x86_64.zip)
 
 Optionally, an Windows installer is also available:
-* [Windows Installer (64-bit)](https://github.com/tbpaolini/spectrachroma/releases/download/v1.0.0/SpectraChroma_1.0.0-Windows_Installer-x64.msi)
+* [Windows Installer (64-bit)](https://github.com/tbpaolini/spectrachroma/releases/download/v1.0.1/SpectraChroma_1.0.1-Windows_Installer-x64.msi)
 
 **Note:** *the program may work on earlier versions of Windows and other flavors of Linux, but that is not guaranteed. Windows 10 and Ubuntu 20.04 are the versions in which SpectraChroma as built and tested into.*
 
 As a matter of convenience, some sample spectra are provided to be tested with SectraChroma:
-* [Sample data](https://github.com/tbpaolini/spectrachroma/releases/download/v1.0.0/Sample_data-SpectraChroma.zip)
+* [Sample data](https://github.com/tbpaolini/spectrachroma/releases/download/v1.0.1/Sample_data-SpectraChroma.zip)
 
 ## Source Code
 SpectraChroma is written in Python 3.9.4 and was exported to Windows and Linux executables using [cx_Freeze](https://marcelotduarte.github.io/cx_Freeze/), which means that no Python installation is required to run the executables.
 
 But you can still get SpectraChorma's source code in Python, so you can run it in Python or build the executable yourself:
-* [Source code (Python 3.9.4)](https://github.com/tbpaolini/spectrachroma/archive/refs/tags/v1.0.0.zip)
+* [Source code (Python 3.9.4)](https://github.com/tbpaolini/spectrachroma/releases/download/v1.0.1/Source_code-SpectraChroma_1.0.1-Python.3.9.4.zip)
 
 The following Python modules (and their dependencies) are required to run SpectraChroma from the source: `colour-science`, `matplotlib`, and `XlsxWriter`. To install all at once, you can run this command on the shell:
 ```sh
@@ -42,3 +42,9 @@ sudo apt-get install python3-tk
 
 ## About
 SpectraChroma was made by Tiago Becerra Paolini (PhD in Chemistry), with valuable programming advice from Guilherme Wiethaus (professional programmer and MD in Chemistry).
+
+## How to cite
+Please cite SpectraChroma on your work as:
+
+Paolini, T. B. (2021). SpectraChroma (Version 1.0.1) [Computer software]. https://doi.org/10.5281/zenodo.4906589
+[![DOI: 10.5281/zenodo.4906589](https://github.com/tbpaolini/spectrachroma/raw/master/assets/doi/DOI-SpectraChroma-all_versions.svg)](https://doi.org/10.5281/zenodo.4906589)
