@@ -1403,7 +1403,7 @@ try:
         os.makedirs("log")
     
     # Create or open the error log file
-    error_log = open(Path("lib", "About.txt"), "a", encoding="utf-8")
+    error_log = open(Path("log", "Error log.txt"), "a", encoding="utf-8")
 
     # Change the shell output to the error log
     sys.stderr = sys.stdout = error_log
